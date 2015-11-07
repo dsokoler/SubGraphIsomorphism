@@ -22,7 +22,9 @@ public class Graph {
 	 * Is a 1D array where the index represents the old value and the value@index represents the new value
 	 * This value will be null if the graph is Q or Q'
 	 */
-	int[]		polymorphism;
+	int[]		isomorphism;
+	
+	
 	
 	/*
 	 * Graph Constructor:
