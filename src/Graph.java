@@ -18,15 +18,6 @@ public class Graph {
 	int 		size;
 	
 	/*
-	 * Each graph (except Q and Q') need an isomorphism to continue the protocol
-	 * Is a 1D array where the index represents the old value and the value@index represents the new value
-	 * This value will be null if the graph is Q or Q'
-	 */
-	int[]		isomorphism;
-	
-	
-	
-	/*
 	 * Graph Constructor:
 	 * @param file: file to build the graph out of
 	 * File input should be as follows: 
@@ -38,5 +29,19 @@ public class Graph {
 	 */
 	public Graph(/* FILE/INPUTSTREAM HERE */) {
 		//Build and return graph here
+	}
+	
+	/*
+	 * Creates a new isomorphism for 
+	 * @param G: Graph from which to permute
+	 * @param GPrime: Graph who is "parent" of this subgraph.
+	 * 
+	 * As seen in handwritten protocol:
+	 * -Permute G to get subgraph of G'
+	 * -Permute G' to get subgraph of Q
+	 */
+	public Graph generateSubgraph(Graph G, Graph GPrime) {
+		
+		return null;
 	}
 }
