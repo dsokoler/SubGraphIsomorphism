@@ -5,7 +5,12 @@ public class Isomorphism {
 	 * Each graph (except Q and Q') need an isomorphism to continue the protocol
 	 * Is a 1D array where the index represents the old value and the value@index represents the new value
 	 */
-	int[]		isomorphism;
+	int[]	isomorphism;
+	
+	/*
+	 * Size of the isomorphism
+	 */
+	int		size;
 	
 	/*
 	 * Generate an isomorphism based on a Graph
@@ -21,8 +26,10 @@ public class Isomorphism {
 		Random random = new Random();
 		for (int i = 0; i < G.size; i++) {
 			int permute = random.nextInt(G.size);
-			swap(i, permute);
+			this.swap(i, permute);
 		}
+		
+		this.size = this.isomorphism.length;
 	}
 	
 	/*
@@ -39,8 +46,17 @@ public class Isomorphism {
 		Random random = new Random();
 		for (int i = 0; i < size; i++) {
 			int permute = random.nextInt(size);
-			swap(i, permute);
+			this.swap(i, permute);
 		}
+		
+		this.size = this.isomorphism.length;
+	}
+	
+	/*
+	 * Empty isomorphism constructor, used for testing
+	 */
+	public Isomorphism() {
+		
 	}
 	
 	/*
@@ -58,8 +74,8 @@ public class Isomorphism {
 	 * Print the isomorphism: mainly for testing purposes
 	 */
 	public void printIsomorphism() {
-		System.out.printf("Size: %d    ", this.isomorphism.length);
-		for (int i = 0; i < this.isomorphism.length; i++) {
+		System.out.printf("Size: %d    ", this.size);
+		for (int i = 0; i < this.size; i++) {
 			System.out.printf("[%d]", this.isomorphism[i]);
 		}
 		System.out.println();

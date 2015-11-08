@@ -30,6 +30,28 @@ public class Main {
 		 * Generate subgraph Q' by applying Beta to G'
 		 */
 		
+		Graph test = new Graph();
+		boolean testAdjacencyMatrix[][] = { {true, true,  true,  true},
+							   				{true, true,  false, false},
+							   				{true, false, true,  true},
+							   				{true, false, true,  true}};		
+		test.adjacencyMatrix = testAdjacencyMatrix;
+		test.size = 4;
+		
+		Isomorphism test1 = new Isomorphism();
+		int testIsomorphism[] = {3, 1, 0, 2};
+		test1.isomorphism = testIsomorphism;
+		test1.size = 4;
+		test1.printIsomorphism();
+		
+		Graph isoG = test.applyIsomorphism(test1);
+		System.out.println("------------------------");
+		System.out.println("Original");
+		test.printGraph();
+		System.out.println("New");
+		isoG.printGraph();
+		System.out.println("------------------------");
+		
 		testIsomorphism();
 	}
 	
@@ -43,5 +65,6 @@ public class Main {
 			Isomorphism test = new Isomorphism(random.nextInt(20 - 10 + 1) + 10);
 			test.printIsomorphism();
 		}
+		System.out.printf("\n\n");
 	}
 }
