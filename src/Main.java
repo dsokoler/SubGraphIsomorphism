@@ -59,10 +59,13 @@ public class Main {
 		int testIsomorphism[] = {3, 1, 0, 2};
 		test1.isomorphism = testIsomorphism;
 		test1.size = 4;
-		test1.printIsomorphism();
 		
 		Graph isoG = test.applyIsomorphism(test1);
 		System.out.println("------------------------");
+		System.out.println("Testing the application of isomorphism");
+		System.out.printf("Isomorphism: ");
+		test1.printIsomorphism();
+		System.out.println();
 		System.out.println("Original");
 		test.printGraph();
 		System.out.println("New");
