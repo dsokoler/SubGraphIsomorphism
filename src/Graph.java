@@ -1,3 +1,5 @@
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 /* 
  * Basic graph class
@@ -95,6 +97,21 @@ public class Graph {
 	public Graph generateSubgraph(Graph G, Graph GPrime) {
 		
 		return null;
+	}
+	
+	public Commitment hash() throws NoSuchAlgorithmException {
+		Commitment Q = new Commitment(this.size);
+		MessageDigest digest = MessageDigest.getInstance("SHA-256");
+		for (int i = 0; i < this.size; i++) {
+			for (int j = 0; j < this.size; j++) {
+				digest.reset();
+				byte[] booleanBytes = {this.adjacencyMatrix[i][j] ? (byte)1 : (byte)0};
+				byte[] input = digest.digest(booleanBytes);
+				
+				Q.commit[i][j] = input;
+			}
+		}
+		return Q;
 	}
 	
 	public void printGraph() {

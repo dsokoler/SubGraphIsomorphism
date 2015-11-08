@@ -1,3 +1,4 @@
+import java.security.NoSuchAlgorithmException;
 import java.util.Random;
 
 public class Main {
@@ -24,10 +25,26 @@ public class Main {
 		Isomorphism alpha, beta, gamma;
 		
 		/*
+		 * Hashed version of Q adjacency matrix
+		 */
+		Commitment commit;
+		
+		/*
 		 * Generate isomorphism Alpha from G2
 		 * Generate isomorphism Beta from G'
 		 * Generate graph Q by applying Alpha to G2
 		 * Generate subgraph Q' by applying Beta to G'
+		 * Generate Q commitment by hashing Q adjacency matrix
+		 */
+		
+		
+		
+		
+		
+		
+		
+		/*
+		 * Testing implemented methods
 		 */
 		
 		Graph test = new Graph();
@@ -53,6 +70,14 @@ public class Main {
 		System.out.println("------------------------");
 		
 		testIsomorphism();
+		System.out.println("------------------------");
+		
+		try {
+			testHashing(test);
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	/*
@@ -66,5 +91,14 @@ public class Main {
 			test.printIsomorphism();
 		}
 		System.out.printf("\n\n");
+	}
+	
+	/*
+	 * Test the hashing functionality
+	 */
+	public static void testHashing(Graph G) throws NoSuchAlgorithmException {
+		System.out.println("Testing Hashing Functionality");
+		Commitment commit = G.hash();
+		commit.printCommit();
 	}
 }
