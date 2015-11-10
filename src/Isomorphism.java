@@ -52,6 +52,22 @@ public class Isomorphism {
 		this.size = this.isomorphism.length;
 	}
 	
+	public Isomorphism(Isomorphism I, Isomorphism J) {
+		if (I.size != J.size) {
+			this.size = -1;
+			return;
+		}
+		
+		this.isomorphism = new int[I.size];
+		this.size = I.size;
+		for (int i = 0; i < I.size; i++) {
+			int firstPos	= I.isomorphism[i];
+			int secondPos	= J.isomorphism[firstPos];
+			
+			this.isomorphism[secondPos] = i;
+		}
+	}
+	
 	/*
 	 * Empty isomorphism constructor, used for testing
 	 */
