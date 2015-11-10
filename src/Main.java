@@ -27,7 +27,7 @@ public class Main {
 		/*
 		 * Hashed version of Q adjacency matrix
 		 */
-		Commitment commit;
+		Commitment Qcommit;
 		
 		/*
 		 * Generate isomorphism Alpha from G2
@@ -36,6 +36,17 @@ public class Main {
 		 * Generate subgraph Q' by applying Beta to G'
 		 * Generate Q commitment by hashing Q adjacency matrix
 		 */
+		alpha 	= new Isomorphism(G2);
+		beta	= new Isomorphism(GPrime);
+		Q		= new Graph(G2, alpha);
+		QPrime	= new Graph(GPrime, beta);
+		try {
+			Qcommit	= Q.hash();
+		} catch (NoSuchAlgorithmException e1) {
+			System.out.println("Q.hash(): NoSuchAlgorithmException");
+			e1.printStackTrace();
+			return;
+		}
 		
 		
 		
