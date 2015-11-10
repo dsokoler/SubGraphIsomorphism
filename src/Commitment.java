@@ -3,6 +3,8 @@
  */
 public class Commitment {
 	
+	//CONSIDER MAKING THIS
+	
 	/*
 	 * The hashed version of our initial graph's adjacency matrix
 	 */

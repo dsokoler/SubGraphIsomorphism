@@ -74,7 +74,6 @@ public class Isomorphism {
 	 * Print the isomorphism: mainly for testing purposes
 	 */
 	public void printIsomorphism() {
-		System.out.printf("Size: %d    ", this.size);
 		for (int i = 0; i < this.size; i++) {
 			System.out.printf("[%d]", this.isomorphism[i]);
 		}
