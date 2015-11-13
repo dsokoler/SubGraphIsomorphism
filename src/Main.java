@@ -31,7 +31,7 @@ public class Main {
 		
 		/*
 		 * Generate isomorphism Alpha from G2
-		 * Generate isomorphism Beta from G'
+		 * Generate isomorphism Beta from G' & alpha (Beta is the relevant parts of alpha as compared to G')
 		 * Generate graph Q by applying Alpha to G2
 		 * Generate subgraph Q' by applying Beta to G'
 		 * Generate Q commitment by hashing Q adjacency matrix
