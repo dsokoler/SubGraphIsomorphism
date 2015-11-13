@@ -105,7 +105,7 @@ public class Graph {
 	 * Apply the relevant parts of alpha to those.
 	 * Strip out all nodes not in the subgraph array of G
 	 */
-	public Graph generateSubgraph(Graph G, Graph GPrime, Isomorphism alpha) {
+	public Graph generateSubgraph(Graph G, Isomorphism alpha) {
 		
 		return null;
 	}
