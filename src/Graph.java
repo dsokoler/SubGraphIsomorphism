@@ -20,6 +20,11 @@ public class Graph {
 	int 		size;
 	
 	/*
+	 * Numbers at each index represent the vertices of the subgraph
+	 */
+	int[]		subgraph;
+	
+	/*
 	 * Graph Constructor:
 	 * @param file: file to build the graph out of
 	 * File input should be as follows: 
@@ -45,6 +50,7 @@ public class Graph {
 			return;
 		}
 		
+		this.subgraph = null;
 		this.adjacencyMatrix = new boolean[G.size][];
 		for (int i = 0; i < G.size; i++) {			//Duplicate old array values into new array values
 			this.adjacencyMatrix[i] = G.adjacencyMatrix[i].clone();
@@ -70,6 +76,7 @@ public class Graph {
 	public Graph (int size) {
 		this.adjacencyMatrix = new boolean[size][size];
 		this.size = size;
+		this.subgraph = null;
 	}
 	
 	/*
@@ -93,8 +100,12 @@ public class Graph {
 	 * As seen in handwritten protocol:
 	 * -Permute G to get subgraph of G'
 	 * -Permute G' to get subgraph of Q
+	 * 
+	 * G has it's vertices correlations to GPrime.
+	 * Apply the relevant parts of alpha to those.
+	 * Strip out all nodes not in the subgraph array of G
 	 */
-	public Graph generateSubgraph(Graph G, Graph GPrime) {
+	public Graph generateSubgraph(Graph G, Graph GPrime, Isomorphism alpha) {
 		
 		return null;
 	}
