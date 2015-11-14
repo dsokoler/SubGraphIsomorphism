@@ -1,6 +1,7 @@
 import java.util.Random;
+import java.io.*;
 
-public class Isomorphism {
+public class Isomorphism implements Serializable {
 	/*
 	 * Each graph (except Q and Q') need an isomorphism to continue the protocol
 	 * Is a 1D array where the index represents the old value and the value@index represents the new value

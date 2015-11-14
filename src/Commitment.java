@@ -1,7 +1,9 @@
+import java.io.Serializable;
+
 /*
  * Used when committing to an initial graph
  */
-public class Commitment {
+public class Commitment implements Serializable{
 	
 	//CONSIDER MAKING THIS
 	

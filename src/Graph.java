@@ -1,29 +1,30 @@
+import java.io.Serializable;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /* 
  * Basic graph class
  */
-public class Graph {
+public class Graph implements Serializable{
 	/*
 	 * 2d representation of the graph
 	 * Index on axis represents an individual node
 	 * Coordinate points tell whether the two nodes (X, Y) are connected (True, False)
 	 */
 	boolean[][] adjacencyMatrix;
-	
+
 	/*
 	 * The number of nodes in the graph
 	 * G.size == G'.size == Q'.size
 	 * G2.size == Q.size
 	 */
 	int 		size;
-	
+
 	/*
 	 * Numbers at each index represent the vertices of the subgraph
 	 */
-	int[]		subgraph;
-	
+	int[] subgraph;
+
 	/*
 	 * Graph Constructor:
 	 * @param file: file to build the graph out of
@@ -37,7 +38,7 @@ public class Graph {
 	public Graph(/* FILE/INPUTSTREAM HERE */) {
 		//Build and return graph here
 	}
-	
+
 	/*
 	 * Generate a Graph by applying isomorphism I to graph G
 	 * @param G: the graph onto whom the isomorphism is applied
@@ -49,26 +50,26 @@ public class Graph {
 			size = -1;
 			return;
 		}
-		
+
 		this.subgraph = null;
 		this.adjacencyMatrix = new boolean[G.size][];
 		for (int i = 0; i < G.size; i++) {			//Duplicate old array values into new array values
 			this.adjacencyMatrix[i] = G.adjacencyMatrix[i].clone();
 		}
 		this.size = G.size;
-		
+
 		for (int i = 0; i < I.size; i++) {
 			int newResident = I.isomorphism[i];
 			if (i == newResident) continue;			//We would be moving the values into the same position
-			
+
 			this.adjacencyMatrix[i] = G.adjacencyMatrix[newResident].clone();
-			
+
 			for (int j = 0; j < G.size; j++) {
 				this.adjacencyMatrix[j][i] = G.adjacencyMatrix[j][newResident];
 			}
 		}
 	}
-	
+
 	/*
 	 * Generate an unconnected graph of size 'size'
 	 * Mainly for testing purposes
@@ -78,7 +79,7 @@ public class Graph {
 		this.size = size;
 		this.subgraph = null;
 	}
-	
+
 	/*
 	 * Generates a new graph based on Isomorphism i
 	 * Returns null if sizes are not compatible
@@ -88,10 +89,10 @@ public class Graph {
 		if (I.size != this.size) {
 			return null;
 		}
-		
+
 		return new Graph(this, I);
 	}
-	
+
 	/*
 	 * Creates a new isomorphism for 
 	 * @param G: Graph from which to permute
@@ -106,10 +107,10 @@ public class Graph {
 	 * Strip out all nodes not in the subgraph array of G
 	 */
 	public Graph generateSubgraph(Graph G, Isomorphism alpha) {
-		
+
 		return null;
 	}
-	
+
 	public Commitment hash() throws NoSuchAlgorithmException {
 		Commitment Q = new Commitment(this.size);
 		MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -118,13 +119,13 @@ public class Graph {
 				digest.reset();
 				byte[] booleanBytes = {this.adjacencyMatrix[i][j] ? (byte)1 : (byte)0};
 				byte[] input = digest.digest(booleanBytes);
-				
+
 				Q.commit[i][j] = input;
 			}
 		}
 		return Q;
 	}
-	
+
 	public void printGraph() {
 		System.out.println("Size: " + this.size);
 		System.out.printf("   ");

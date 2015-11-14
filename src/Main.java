@@ -9,7 +9,7 @@ public class Main {
 	public static void main(String[] args) {
 		/*
 		 * As seen in written protocol:
-		 * G, G2 are public (GIVEN)
+		 * G1, G2 are public (GIVEN)
 		 * G' is isomorphic to G and subgraph of G2 (is private to prover, GIVEN)
 		 * Q is isomorphic to G2
 		 * Q' is isomorphic to G' and a subgraph of Q
