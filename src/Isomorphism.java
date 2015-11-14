@@ -92,6 +92,10 @@ public class Isomorphism implements Serializable {
 	 */
 	public void printIsomorphism() {
 		for (int i = 0; i < this.size; i++) {
+			System.out.printf(" %d ", i);
+		}
+		System.out.println();
+		for (int i = 0; i < this.size; i++) {
 			System.out.printf("[%d]", this.isomorphism[i]);
 		}
 		System.out.println();

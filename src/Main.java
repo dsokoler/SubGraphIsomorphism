@@ -1,4 +1,5 @@
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Random;
 
 public class Main {
@@ -68,7 +69,7 @@ public class Main {
 		 * Testing implemented methods
 		 */
 		
-		Graph test = new Graph();
+		/*Graph test = new Graph();
 		boolean testAdjacencyMatrix[][] = { {true, true,  true,  true},
 							   				{true, true,  false, false},
 							   				{true, false, true,  true},
@@ -111,13 +112,81 @@ public class Main {
 		System.out.println("------------------------");
 		testIsomorphism();
 		System.out.println("------------------------");
+		Graph isoGSubgraph = isoG.generateSubgraph(3);
+		printIntArray(isoG.subgraph);
+		System.out.println();
+		isoGSubgraph.printGraph();
+		System.out.println("------------------------");
 		
 		try {
 			testHashing(test);
 		} catch (NoSuchAlgorithmException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}*/
+		
+		Graph G2test = new Graph();
+		boolean testAdjacencyMatrix[][] = 
+			{
+				{true,  true,  false, false, true,  false, false, false},
+				{true,  true,  false, true,  true,  false, false, true},
+				{false, false, true,  true,  true,  false, true,  true},
+				{false, true,  true,  true,  false, true,  true,  false},
+				{true,  true,  true,  false, true,  true,  false, false},
+				{false, false, false, true,  true,  true,  false, false},
+				{false, false, true,  true,  false, false, true,  true},
+				{false, true,  true,  false, false, false, true,  true}
+			};
+		G2test.adjacencyMatrix = testAdjacencyMatrix;
+		G2test.size = 8;
+		int[] G2toGPrime = {0, 1, 2, 3, 4};
+		G2test.subgraph = G2toGPrime;
+		G2test.subgraphSize = 5;
+		
+		Graph GprimeTest = new Graph();
+		boolean testAdjacencyMatrix2[][] = 
+			{
+				{true,  true,  false, false, true},
+				{true,  true,  false, true,  true},
+				{false, false, true,  true,  true},
+				{false, true,  true,  true,  false},
+				{true,  true,  true,  false, true}
+			};
+		GprimeTest.adjacencyMatrix = testAdjacencyMatrix2;
+		GprimeTest.size = 5;
+		
+		
+		
+		System.out.println("------------------------------------");
+		System.out.println("The following two graphs should be identical:");
+		Graph subgraphTest = G2test.generateSubgraph();
+		subgraphTest.printGraph();
+		GprimeTest.printGraph();
+		if ( Arrays.deepEquals(subgraphTest.adjacencyMatrix, GprimeTest.adjacencyMatrix) ) {
+			System.out.println("IDENTICAL");
 		}
+		else {
+			System.out.println("DIFFERENT");
+		}
+		System.out.println("------------------------------------");
+		
+		
+		
+		Isomorphism alphaTest = new Isomorphism();
+		int[] alphaTestIsomorphism = {2, 4, 1, 6, 5, 7, 3, 0};
+		alphaTest.isomorphism = alphaTestIsomorphism;
+		alphaTest.size = 8;
+		
+		Graph Qtest = G2test.applyIsomorphism(alphaTest);
+		alphaTest.printIsomorphism();
+		G2test.printGraph();
+		Qtest.printGraph();
+		
+		//At this point we have G2, G', alpha, and Q
+		
+		Graph QprimeTest = Qtest.generateSubgraph(5);
+		Isomorphism alphaPrime = Qtest.generateSubIsomorphism(alphaTest);
+		alphaPrime.printIsomorphism();
 	}
 	
 	/*

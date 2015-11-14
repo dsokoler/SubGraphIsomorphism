@@ -1,6 +1,7 @@
 import java.io.Serializable;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Random;
 
 /* 
  * Basic graph class
@@ -22,8 +23,14 @@ public class Graph implements Serializable{
 
 	/*
 	 * Numbers at each index represent the vertices of the subgraph
+	 * Is basically the same as a mapping (index is subgraph's node, value at index is parent's node)
 	 */
 	int[] subgraph;
+	
+	/*
+	 * 
+	 */
+	int subgraphSize;
 
 	/*
 	 * Graph Constructor:
@@ -58,7 +65,7 @@ public class Graph implements Serializable{
 		}
 		this.size = G.size;
 
-		for (int i = 0; i < I.size; i++) {
+		/*for (int i = 0; i < I.size; i++) {
 			int newResident = I.isomorphism[i];
 			if (i == newResident) continue;			//We would be moving the values into the same position
 
@@ -66,6 +73,14 @@ public class Graph implements Serializable{
 
 			for (int j = 0; j < G.size; j++) {
 				this.adjacencyMatrix[j][i] = G.adjacencyMatrix[j][newResident];
+			}
+		}*/
+		
+		for (int i = 0; i < I.size; i++) {				//i: row in G
+			int newI = I.isomorphism[i];				//newI: new row in G
+			for (int j = 0; j < I.size; j++) {			//j: column in G
+				int newJ = I.isomorphism[j];			//newJ: new column in G
+				this.adjacencyMatrix[newI][newJ] = G.adjacencyMatrix[i][j];
 			}
 		}
 	}
@@ -94,21 +109,81 @@ public class Graph implements Serializable{
 	}
 
 	/*
-	 * Creates a new isomorphism for 
-	 * @param G: Graph from which to permute
-	 * @param GPrime: Graph who is "parent" of this subgraph.
+	 * Generate subgraph Q' from Q
+	 * @param size: the intended size of subgraph Q'
 	 * 
-	 * As seen in handwritten protocol:
-	 * -Permute G to get subgraph of G'
-	 * -Permute G' to get subgraph of Q
+	 * Randomly choose 'size' nodes from Q to be in Q prime
 	 * 
-	 * G has it's vertices correlations to GPrime.
-	 * Apply the relevant parts of alpha to those.
-	 * Strip out all nodes not in the subgraph array of G
+	 * returns a Graph generated from the subgraph array
 	 */
-	public Graph generateSubgraph(Graph G, Isomorphism alpha) {
-
-		return null;
+	public Graph generateSubgraph(int size) {
+		this.subgraph = new int[size];
+		this.subgraphSize = size;
+		
+		boolean[] valSeen = new boolean[this.size];
+		
+		Random random = new Random();
+		
+		for (int i = 0; i < this.subgraphSize; i++) {
+			int node = random.nextInt(this.size);
+			while (valSeen[node] == true) {
+				node = random.nextInt(this.size);
+			}
+			this.subgraph[i] = node;
+			valSeen[node] = true;
+		}
+		
+		java.util.Arrays.sort(this.subgraph);
+		
+		return this.generateSubgraph();
+	}
+	
+	/*
+	 * Generate an actual graph object given the parent and the listing of subgraph nodes
+	 * @param subgraph: the listing of nodes that comprise the subgraph
+	 * 
+	 * Parent graph is 'this'
+	 */
+	public Graph generateSubgraph() {
+		Graph Qprime = new Graph(this.subgraphSize);
+		
+		//i is the index into the subgraph's adjacency matrix
+		for (int i = 0; i < this.subgraphSize; i++) {
+			int node = this.subgraph[i];	//a node from parent graph that is included in the subgraph
+			for (int j = 0; j < this.subgraphSize; j++) {
+				if (i == j) {
+					Qprime.adjacencyMatrix[i][j] = true;
+					continue;
+				}
+				
+				int otherNode = this.subgraph[j];
+				Qprime.adjacencyMatrix[i][j] = this.adjacencyMatrix[node][otherNode]; 
+			}
+				
+		}
+				
+		return Qprime;
+	}
+	
+	/*
+	 * 'this' = Q
+	 * @param alpha: the large isomorphism
+	 * 
+	 * returns the relevant portions of alpha when used with Q'
+	 */
+	public Isomorphism generateSubIsomorphism(Isomorphism alpha) {
+		Isomorphism I 	= new Isomorphism();
+		I.isomorphism 	= new int[this.subgraphSize];
+		I.size 			= this.subgraphSize;
+		
+		for (int i = 0; i < this.subgraphSize; i++) {
+			int mapping = this.subgraph[i];
+			int newPos = alpha.isomorphism[mapping];
+			System.out.printf("newPos: %d\ti: %d\n", newPos, i);
+			I.isomorphism[newPos] = i;
+		}
+		
+		return I;
 	}
 
 	public Commitment hash() throws NoSuchAlgorithmException {
