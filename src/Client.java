@@ -1,119 +1,75 @@
-import java.net.*;
 import java.io.*;
+import java.net.*;
+import java.util.Arrays;
 
-public class Client
-{
-	Socket client = null;
-	InputStream inFromServer = null;
-	OutputStream outToServer = null;
+public class Client {
+
+	static Socket socketConnection;
+	static ObjectOutputStream clientOutputStream;
+	static ObjectInputStream clientInputStream;
 
 	Client() {
-		String serverName = "localhost";
-		int port = 9595;
 		try {
-			client = new Socket(serverName, port);
-			System.out.println("Connected to " + client.getRemoteSocketAddress());
-			outToServer = client.getOutputStream();
-			inFromServer = client.getInputStream();
-		}
-		catch(IOException e) {
-			System.out.println("Client : Unable to connect to server");
-		}
-	}
-
-	
-	public boolean writeBit(int bit) {
-		try {
-			DataOutputStream out = new DataOutputStream(outToServer);
-			out.writeInt(bit);
-		} catch (Exception e) {
-			System.out.println("Client : Unable to writeBit");
-			return false;
-		}
-		return true;
-	}
-
-	
-	public int readBit() {
-		int readIn;
-		try {
-			DataInputStream in = new DataInputStream(inFromServer);
-			readIn = in.readInt();
-		} catch (Exception e) {
-			System.out.println("Client : Unable to readBit");
-			return -1;
-		}
-		return readIn;
-	}
-
-	public boolean writeObject(Object obj) {
-		try {
-			ObjectOutputStream out = new ObjectOutputStream(outToServer);
-			out.writeObject(obj);
-		} catch (Exception e) {
+			socketConnection = new Socket("127.0.0.1", 11111);
+			clientOutputStream = new ObjectOutputStream(socketConnection.getOutputStream());
+			clientInputStream = new ObjectInputStream(socketConnection.getInputStream());
+		} catch (IOException e) {
 			e.printStackTrace();
-			System.out.println("Client : Unable to writeObject");
-			return false;
-		}
-		return true;
-	}
-	
-	public Object readObject() {
-		Object obj = null;
-		try {
-			ObjectInputStream in = new ObjectInputStream(inFromServer);
-			obj = in.readObject();
-		} catch (Exception e) {
-			System.out.println("Client : Unable to readObject");
-		}
-		return obj;
-	}
-	
-	public boolean writeString(String str) {
-		try {
-			DataOutputStream out = new DataOutputStream(outToServer);
-			out.writeUTF(str);
-		} catch (Exception e) {
-			System.out.println("Client : Unable to writeString");
-			return false;
-		}
-		return true;
+		}	
 	}
 
-	public String readString() {
-		String readIn = null;
+	public static void writeObject(Object ob) {
 		try {
-			DataInputStream in = new DataInputStream(inFromServer);
-			readIn = in.readUTF();
-		} catch (Exception e) {
-			System.out.println("Client : Unable to readString");
-			return "Didn't work";
+			clientOutputStream.writeObject(ob);
+			clientOutputStream.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		return readIn;
 	}
 
-	public void close() {
-		if(client != null)
-			try {
-				inFromServer.close();
-				outToServer.close();
-				client.close();
-			} catch (IOException e) {
-				System.out.println("Client : Failed at closing");
-			}
+	public static Object readObject() {
+		try {
+			Object ob = clientInputStream.readObject();
+			return ob;
+		} catch (ClassNotFoundException | IOException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
-	public static void main(String [] args)
-	{
-		Client c1 = new Client();
-		
-		//Graph g1 = (Graph)c1.readObject();
-		//g1.printGraph();
-		
-		Graph g1 = new Graph(2);
-		c1.writeObject(g1);
-		
-		
-		//c1.close();
+	public static void writeBit(int i) {
+		writeObject(new Integer(i));
 	}
+
+	public static int readBit() {
+		Integer i = (Integer)readObject();
+		return i.intValue();
+	}
+
+	public static void close() {
+		try {
+			clientOutputStream.close();
+			clientInputStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/*public static void main(String[] arg) {
+
+		int[] arr = {1, 2, 7};
+		new Client();
+		Client.writeObject(arr);
+
+		System.out.println(Arrays.toString((int[])Client.readObject()));
+		
+		Client.writeBit(1);
+		
+		System.out.println(readBit());
+		System.out.println(readBit());
+		
+		
+
+		Client.close();
+	}*/
 }

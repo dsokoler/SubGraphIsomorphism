@@ -1,99 +1,77 @@
 import java.net.*;
+import java.util.Arrays;
 import java.io.*;
 
-// Note: never close an input/output stream or any wrapper over it. 
 
 public class Server 
 {
-	Socket server;
-	DataInputStream in = null;
-	DataOutputStream out = null;
-	//ObjectOutputStream oout = null;
-	//ObjectInputStream oin = null;
-	
-	public Server()	{
-		ServerSocket serverSocket  = null;
+	ServerSocket socketConnection;
+	Socket pipe ;
+	static ObjectInputStream serverInputStream;
+	static ObjectOutputStream serverOutputStream;
+
+	Server() {
 		try {
-			serverSocket = new ServerSocket(9595);
-			serverSocket.setSoTimeout(15000);
-			System.out.println("Waiting for client on port " + serverSocket.getLocalPort());
-			Socket server = serverSocket.accept();
-			System.out.println("Connected to " + server.getRemoteSocketAddress());
-			in = new DataInputStream(server.getInputStream());
-			out = new DataOutputStream(server.getOutputStream());
-			//oin = new ObjectInputStream(server.getInputStream());
-			//oout = new ObjectOutputStream(server.getOutputStream());
+			socketConnection = new ServerSocket(11111);
+			pipe = socketConnection.accept();
+			serverInputStream = new ObjectInputStream(pipe.getInputStream());
+			serverOutputStream = new ObjectOutputStream(pipe.getOutputStream());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public int readBit() {
-		int ret = -1;
+	public static void writeObject(Object obj) {	
 		try {
-			ret = in.readInt();
-		} catch (Exception e) {
-			System.out.println("Server : readBit failed");
-		}
-		return ret;
-	}
-
-
-	public void writeBit(int bit) {
-		try {
-			out.writeInt(bit);
-		} catch (Exception e) {
-			System.out.println("Server : writeBit failed");
-		}
-	}
-
-	public void writeRandomBit() {
-		int n = (int)((10 * Math.random()) % 2);
-		//System.out.println("n = " + n);
-		writeBit(n);
-	}
-
-	public void writeObject(Object obj) {
-		try {
-			ObjectOutputStream oout = new ObjectOutputStream(server.getOutputStream());
-			oout.writeObject(obj);
+			serverOutputStream.writeObject(obj);
+			serverOutputStream.flush();
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println("Server : writeObject failed");
 		}
 	}
-	
-	public Object readObject() {
-		Object obj = null;
+
+	public static Object readObject() {
 		try {
-			ObjectInputStream oin = new ObjectInputStream(server.getInputStream());
-			obj = oin.readObject();
+			Object ob = serverInputStream.readObject();
+			return ob;
 		} catch (Exception e) {
-			System.out.println("Server : readObject failed");
+			System.out.println("returning null");
+			return null;
 		}
-		return obj;
+	}
+
+	public static void writeBit(int i) {
+		writeObject(new Integer(i));
 	}
 	
-	public void close() {
+	public static int readBit() {
+		Integer i = (Integer)readObject();
+		return i.intValue();
+	}
+	
+	public static void close() {
 		try {
-			if(server != null) server.close();
+			serverInputStream.close();
+			serverOutputStream.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
+	
+	
+	/*public static void main(String [] args)	{
+		new Server();
 
-	public static void main(String [] args)
-	{
-		Server s1 = new Server();
-		
-		//Graph g1 = new Graph(2);
-		//g1.printGraph();
-		//s1.writeObject(g1);
-		
-		Graph g1 = (Graph)s1.readObject();
-		g1.printGraph();
-		
-		//s1.close();
+		int[] a = (int[])Server.readObject();
+		System.out.println(Arrays.toString(a));
+		Server.writeObject(new int[]{1,9,1});
 
-	}
+		System.out.println(Server.readBit());
+		
+		Server.writeBit(1);
+		Server.writeBit(0);
+		
+		
+		Server.close();
+	}*/
 }
