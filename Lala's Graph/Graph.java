@@ -134,6 +134,16 @@ public class Graph {
 		return false;
 	}
 
+
+    static int[] addIsomorphism(int[] iso1, int[] iso2) {
+            
+        int[] isof = new int[iso1.length];
+        for(int i =0; i <iso1.length; i++) {
+            isof[i] = iso2[iso1[i]];            
+        }
+        return isof;
+    }
+
 	public static void main(String[] args) {
 		boolean adjMat[][] = 
 			{
@@ -164,7 +174,13 @@ public class Graph {
 
 		// printing subgraph
 		printSubgraph(s, subgraph);
-	}
+	    
+        // adding isomorphism
+        int[] isomorphism2 = {5, 6, 3, 0, 2, 4, 7, 1};
+        int[] newIsomorphism = addIsomorphism(isomorphism, isomorphism2);
+        System.out.println(Arrays.toString(newIsomorphism));
+    
+    }
 
 }
 
