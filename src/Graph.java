@@ -1,225 +1,214 @@
-import java.io.Serializable;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Random;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
-/* 
- * Basic graph class
- */
-public class Graph implements Serializable{
-	/*
-	 * 2d representation of the graph
-	 * Index on axis represents an individual node
-	 * Coordinate points tell whether the two nodes (X, Y) are connected (True, False)
-	 */
-	boolean[][] adjacencyMatrix;
 
-	/*
-	 * The number of nodes in the graph
-	 * G.size == G'.size == Q'.size
-	 * G2.size == Q.size
-	 */
-	int 		size;
 
-	/*
-	 * Numbers at each index represent the vertices of the subgraph
-	 * Is basically the same as a mapping (index is subgraph's node, value at index is parent's node)
-	 */
-	int[] subgraph;
-	
-	/*
-	 * 
-	 */
-	int subgraphSize;
+public class Graph {
 
-	/*
-	 * Graph Constructor:
-	 * @param file: file to build the graph out of
-	 * File input should be as follows: 
-	 *  4 					Number of Vertices
-	 *  0 1 2 3			Vertex number followed by all connected nodes separated by 1 space
-	 *  1 0 3
-	 *  2 0
-	 *  3 0 1
-	 */
-	public Graph(/* FILE/INPUTSTREAM HERE */) {
-		//Build and return graph here
-	}
+	List<Vertex> graph = new ArrayList<Vertex>();
 
-	/*
-	 * Generate a Graph by applying isomorphism I to graph G
-	 * @param G: the graph onto whom the isomorphism is applied
-	 * @param I: the isomorphism to apply
-	 */
-	public Graph (Graph G, Isomorphism I) {
-		if (G.size != I.size) {
-			this.adjacencyMatrix = null;
-			size = -1;
-			return;
-		}
-
-		this.subgraph = null;
-		this.adjacencyMatrix = new boolean[G.size][];
-		for (int i = 0; i < G.size; i++) {			//Duplicate old array values into new array values
-			this.adjacencyMatrix[i] = G.adjacencyMatrix[i].clone();
-		}
-		this.size = G.size;
-
-		/*for (int i = 0; i < I.size; i++) {
-			int newResident = I.isomorphism[i];
-			if (i == newResident) continue;			//We would be moving the values into the same position
-
-			this.adjacencyMatrix[i] = G.adjacencyMatrix[newResident].clone();
-
-			for (int j = 0; j < G.size; j++) {
-				this.adjacencyMatrix[j][i] = G.adjacencyMatrix[j][newResident];
-			}
-		}*/
-		
-		for (int i = 0; i < I.size; i++) {				//i: row in G
-			int newI = I.isomorphism[i];				//newI: new row in G
-			for (int j = 0; j < I.size; j++) {			//j: column in G
-				int newJ = I.isomorphism[j];			//newJ: new column in G
-				this.adjacencyMatrix[newI][newJ] = G.adjacencyMatrix[i][j];
-			}
-		}
-	}
-
-	/*
-	 * Generate an unconnected graph of size 'size'
-	 * Mainly for testing purposes
-	 */
-	public Graph (int size) {
-		this.adjacencyMatrix = new boolean[size][size];
-		this.size = size;
-		this.subgraph = null;
-	}
-
-	/*
-	 * Generates a new graph based on Isomorphism i
-	 * Returns null if sizes are not compatible
-	 * @param i: the isomorphism to be applied to the graph
-	 */
-	public Graph applyIsomorphism(Isomorphism I) {
-		if (I.size != this.size) {
-			return null;
-		}
-
-		return new Graph(this, I);
-	}
-
-	/*
-	 * Generate subgraph Q' from Q
-	 * @param size: the intended size of subgraph Q'
-	 * 
-	 * Randomly choose 'size' nodes from Q to be in Q prime
-	 * 
-	 * returns a Graph generated from the subgraph array
-	 */
-	public Graph generateSubgraph(int size) {
-		this.subgraph = new int[size];
-		this.subgraphSize = size;
-		
-		boolean[] valSeen = new boolean[this.size];
-		
-		Random random = new Random();
-		
-		for (int i = 0; i < this.subgraphSize; i++) {
-			int node = random.nextInt(this.size);
-			while (valSeen[node] == true) {
-				node = random.nextInt(this.size);
-			}
-			this.subgraph[i] = node;
-			valSeen[node] = true;
-		}
-		
-		java.util.Arrays.sort(this.subgraph);
-		
-		return this.generateSubgraph();
-	}
-	
-	/*
-	 * Generate an actual graph object given the parent and the listing of subgraph nodes
-	 * @param subgraph: the listing of nodes that comprise the subgraph
-	 * 
-	 * Parent graph is 'this'
-	 */
-	public Graph generateSubgraph() {
-		Graph Qprime = new Graph(this.subgraphSize);
-		
-		//i is the index into the subgraph's adjacency matrix
-		for (int i = 0; i < this.subgraphSize; i++) {
-			int node = this.subgraph[i];	//a node from parent graph that is included in the subgraph
-			for (int j = 0; j < this.subgraphSize; j++) {
-				if (i == j) {
-					Qprime.adjacencyMatrix[i][j] = true;
-					continue;
+	Graph(boolean[][] mat) {
+		for(int i = 0; i < mat.length; i++) {
+			Vertex v = new Vertex();
+			for(int j = 0; j < mat[i].length; j++) {
+				if(mat[i][j] == true) {
+					v.add(j);
 				}
-				
-				int otherNode = this.subgraph[j];
-				Qprime.adjacencyMatrix[i][j] = this.adjacencyMatrix[node][otherNode]; 
 			}
-				
+			graph.add(i, v);
 		}
-				
-		return Qprime;
-	}
-	
-	/*
-	 * 'this' = Q
-	 * @param alpha: the large isomorphism
-	 * 
-	 * returns the relevant portions of alpha when used with Q'
-	 */
-	public Isomorphism generateSubIsomorphism(Isomorphism alpha) {
-		Isomorphism I 	= new Isomorphism();
-		I.isomorphism 	= new int[this.subgraphSize];
-		I.size 			= this.subgraphSize;
-		
-		for (int i = 0; i < this.subgraphSize; i++) {
-			int mapping = this.subgraph[i];
-			int newPos = alpha.isomorphism[mapping];
-			System.out.printf("newPos: %d\ti: %d\n", newPos, i);
-			I.isomorphism[newPos] = i;
-		}
-		
-		return I;
 	}
 
-	public Commitment hash() throws NoSuchAlgorithmException {
-		Commitment Q = new Commitment(this.size);
-		MessageDigest digest = MessageDigest.getInstance("SHA-256");
-		for (int i = 0; i < this.size; i++) {
-			for (int j = 0; j < this.size; j++) {
-				digest.reset();
-				byte[] booleanBytes = {this.adjacencyMatrix[i][j] ? (byte)1 : (byte)0};
-				byte[] input = digest.digest(booleanBytes);
-
-				Q.commit[i][j] = input;
-			}
-		}
-		return Q;
-	}
-
-	public void printGraph() {
-		System.out.println("Size: " + this.size);
-		System.out.printf("   ");
-		for (int i = 0; i < this.size; i++) {
-			System.out.printf(" %d ", i);
+	void printGraph() {
+		System.out.printf(" ");
+		for(int i = 0; i < graph.size(); i++) {
+			System.out.printf(" %d", i);
 		}
 		System.out.println();
-		for (int i = 0; i < this.size; i++) {
-			System.out.printf(" %d ", i);
-			for (int j = 0; j < this.size; j++) {
-				if  (this.adjacencyMatrix[i][j] == true) {
-					System.out.printf(" T ");
+
+		for(int i = 0; i < graph.size(); i++) {
+			System.out.printf("%d ", i);
+			Vertex v = graph.get(i);
+			for(int j =0; j < graph.size(); j++) {
+				if(v.contains(j)) {
+					System.out.printf("T ");
 				}
 				else {
-					System.out.printf(" F ");
+					System.out.printf("F ");
 				}
 			}
 			System.out.println();
 		}
-		System.out.printf("\n\n");
 	}
+
+
+	void doIsomorphism(int[] iso) {
+		List<Vertex> n = new ArrayList<Vertex>(Collections.nCopies(graph.size(), null));
+		int[] changes = new int[graph.size()];
+
+		// fix individual positions
+		for(int i = 0; i < graph.size(); i++) {
+			Vertex v = graph.get(i);
+			//System.out.println("iso[i] = " + iso[i]);
+			//v.print();
+			v.remove(i);
+			//v.add(iso[i]);
+			n.set(iso[i], v);
+			changes[i] = iso[i];
+		}
+
+		// fix relative positions
+		for (int i = 0; i < n.size(); i++) {
+			Vertex v = n.get(i);
+			for(int j =0; j < v.size(); j++) {
+				int x = v.get(j);
+				v.set(j, iso[x]);
+			}
+			v.add(i);
+			n.set(i, v);
+		}
+		graph = n;
+	}
+
+	List<Vertex> getSubgraph(int[] arr) {
+		List<Vertex> subgraph1 = new ArrayList<Vertex>();
+		List<Vertex> subgraph2 = new ArrayList<Vertex>();
+		
+		// add all connections
+		for(int i =0; i < arr.length; i++) {
+			Vertex v = graph.get(arr[i]);
+			subgraph1.add(v);
+		}
+		
+		
+		//System.out.println(Arrays.toString(arr));
+		// remove connections not needed
+		//System.out.println("subgraph.size = " + subgraph1.size());
+		for (int i = 0; i < subgraph1.size(); i++) {
+			Vertex v = subgraph1.get(i);
+			//System.out.println("v.size =" + v.size());
+			Vertex k = new Vertex();
+			for (int j = 0; j < v.size(); j++) {
+				//System.out.println("v.get(j) =" + v.get(j));
+				if(contains(arr, v.get(j))) {
+					//System.out.println("adding");
+					k.add(v.get(j));
+				}
+			}
+			subgraph2.add(k);
+		}
+		return subgraph2;
+	}
+	
+	static void printSubgraph(List<Vertex> s, int[] subgraph) {
+		System.out.printf(" ");
+		for(int i = 0; i < s.size(); i++) {
+			System.out.printf(" %d", i);
+		}
+		System.out.println();
+
+		for(int i = 0; i < s.size(); i++) {
+			System.out.printf("%d ", i);
+			Vertex v = s.get(i);
+			for(int j =0; j < subgraph.length; j++) {
+				if(v.contains(subgraph[j])) {
+					System.out.printf("T ");
+				}
+				else {
+					System.out.printf("F ");
+				}
+			}
+			System.out.println();
+		}
+		
+	}
+	
+	public static boolean contains(int[] arr, int k) {
+		for(int i =0; i < arr.length; i++) {
+			if(k == arr[i]) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static void main(String[] args) {
+		boolean adjMat[][] = 
+			{
+				{true,  true,  false, false, true,  false, false, false},
+				{true,  true,  false, true,  true,  false, false, true},
+				{false, false, true,  true,  true,  false, true,  true},
+				{false, true,  true,  true,  false, true,  true,  false},
+				{true,  true,  true,  false, true,  true,  false, false},
+				{false, false, false, true,  true,  true,  true, false},
+				{false, false, true,  true,  false, false, true,  true},
+				{false, true,  true,  false, false, false, true,  true}
+			};
+
+		Graph g = new Graph(adjMat);
+		g.printGraph();
+
+		int[] isomorphism = {7, 2, 0, 6, 1, 4, 3, 5};
+		// 7 goes to 0, 2 goes 1, 0 goes 2 and so on
+		// 7 gets 0's column/row
+		
+		g.doIsomorphism(isomorphism);
+		g.printGraph();
+
+
+		int[] subgraph = {1, 5, 6, 7};
+		List<Vertex> s =g.getSubgraph(subgraph);
+		
+
+		// printing subgraph
+		printSubgraph(s, subgraph);
+	}
+
+}
+
+class Vertex {
+
+	List<Integer> v = new ArrayList<Integer>();
+
+	void add(int i) {
+		v.add(i);
+	}
+
+	void set(int index, int i) {
+		v.set(index, i);
+	}
+
+	int size() {
+		return v.size();
+	}
+
+	Integer get(int i) {
+		return v.get(i);
+	}
+
+	boolean contains(int i) {
+		if(v.contains(i)) {
+			return true;
+		}
+		return false;
+	}
+
+	void remove(int i) {
+		int index = v.indexOf(i);
+		v.remove(index);
+	}
+
+	void print() {
+		for (int i = 0; i < v.size(); i++) {
+			System.out.printf("%d ", v.get(i));
+		}
+		System.out.printf("\n");
+	}
+
+	void clear() {
+		v.clear();
+	}
+
 }

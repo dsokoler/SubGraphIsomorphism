@@ -4,24 +4,24 @@ import java.io.Serializable;
  * Used when committing to an initial graph
  */
 public class Commitment implements Serializable{
-	
+
 	//CONSIDER MAKING THIS
-	
+
 	/*
 	 * The hashed version of our initial graph's adjacency matrix
 	 */
 	byte[] [][] commit;
-	
+
 	/*
 	 * The size of our 2d hashed adjacency matrix
 	 */
 	int size;
-	
+
 	public Commitment(int size) {
 		this.commit = new byte[size][size][];
 		this.size = size;
 	}
-	
+
 	public void printCommit() {
 		for (int i = 0; i < this.size; i++) {
 			for (int j = 0; j < this.size; j++) {
