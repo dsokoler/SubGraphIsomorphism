@@ -148,13 +148,22 @@ public class Graph {
 	}
 	
 	/*
-	 * Used for verifier to check the graph they received is the same as the
+	 * Used for verifier to check the full graph they received is the same as the
 	 * commitment they received earlier
 	 */
 	public boolean verifyCommitment(Commitment commit) {
 		Commitment verify = new Commitment(this.adjacencyMatrix);
 		
 		return Arrays.deepEquals(verify.commit, commit.commit);
+	}
+	
+	/*
+	 * Used for verifier to check the subgraph they received is within
+	 * the commitment they received earlier
+	 */
+	public boolean verifyCommitment(Commitment commit, int[] nodes) {
+		
+		return true;
 	}
 
 	public static void main(String[] args) {
@@ -192,6 +201,8 @@ public class Graph {
 		try {
 			Commitment GCommit = g.commit();
 			GCommit.printCommit();
+			
+			System.out.println("Comparison of G and Commitment: " + g.verifyCommitment(GCommit));
 		} catch (NoSuchAlgorithmException e) {
 			System.out.println("SHA-256 does not exist");
 		}

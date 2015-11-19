@@ -1,6 +1,7 @@
 import java.io.Serializable;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 /*
  * Used when committing to an initial graph
@@ -38,12 +39,15 @@ public class Commitment implements Serializable{
 			}
 		} catch(NoSuchAlgorithmException e) {
 			System.out.println("SHA-256 does not exist");
+			commit = null;
+			size = -1;
 		}
 	}
 	
-	public boolean verifyCommit(Graph g) {
+	public boolean verifyCommitment(Graph g) {
+		Commitment verify = new Commitment(g.adjacencyMatrix);
 		
-		return true;
+		return Arrays.deepEquals(this.commit, verify.commit);
 	}
 
 	public void printCommit() {
