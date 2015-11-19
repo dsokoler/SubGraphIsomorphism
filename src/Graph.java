@@ -45,7 +45,12 @@ public class Graph {
 
 
 	void doIsomorphism(int[] iso) {
-		List<Vertex> n = new ArrayList<Vertex>(Collections.nCopies(graph.size(), null));
+		List<Vertex> n = new ArrayList<Vertex>();
+		
+		// initializing arraylist to required size
+		for (int i = 0; i < graph.size(); i++) {
+		    n.add(null);
+		}
 		int[] changes = new int[graph.size()];
 
 		// fix individual positions
