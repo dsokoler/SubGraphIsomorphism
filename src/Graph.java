@@ -146,6 +146,16 @@ public class Graph {
 		}
 		return false;
 	}
+	
+	/*
+	 * Used for verifier to check the graph they received is the same as the
+	 * commitment they received earlier
+	 */
+	public boolean verifyCommitment(Commitment commit) {
+		Commitment verify = new Commitment(this.adjacencyMatrix);
+		
+		return Arrays.deepEquals(verify.commit, commit.commit);
+	}
 
 	public static void main(String[] args) {
 		boolean adjMat[][] = 
