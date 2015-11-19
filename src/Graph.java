@@ -1,3 +1,4 @@
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -8,8 +9,11 @@ import java.util.List;
 public class Graph {
 
 	List<Vertex> graph = new ArrayList<Vertex>();
+	
+	boolean[][] adjacencyMatrix;
 
 	Graph(boolean[][] mat) {
+		adjacencyMatrix = mat;
 		for(int i = 0; i < mat.length; i++) {
 			Vertex v = new Vertex();
 			for(int j = 0; j < mat[i].length; j++) {
@@ -107,6 +111,10 @@ public class Graph {
 		return subgraph2;
 	}
 	
+	public Commitment commit() throws NoSuchAlgorithmException {
+		return new Commitment(this.adjacencyMatrix);
+	}
+	
 	static void printSubgraph(List<Vertex> s, int[] subgraph) {
 		System.out.printf(" ");
 		for(int i = 0; i < s.size(); i++) {
@@ -169,6 +177,15 @@ public class Graph {
 
 		// printing subgraph
 		printSubgraph(s, subgraph);
+		
+		System.out.println("-----------------------------");
+		try {
+			Commitment GCommit = g.commit();
+			GCommit.printCommit();
+		} catch (NoSuchAlgorithmException e) {
+			System.out.println("SHA-256 does not exist");
+		}
+		System.out.println("-----------------------------");
 	}
 
 }

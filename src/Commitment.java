@@ -1,4 +1,6 @@
 import java.io.Serializable;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 /*
  * Used when committing to an initial graph
@@ -9,6 +11,7 @@ public class Commitment implements Serializable{
 
 	/*
 	 * The hashed version of our initial graph's adjacency matrix
+	 * 2d array where each entry is an array of bytes
 	 */
 	byte[] [][] commit;
 
@@ -17,9 +20,30 @@ public class Commitment implements Serializable{
 	 */
 	int size;
 
-	public Commitment(int size) {
-		this.commit = new byte[size][size][];
-		this.size = size;
+	public Commitment(boolean[][] matrix) {
+		this.commit = new byte[matrix.length][matrix.length][];
+		this.size = matrix.length;
+		
+		try {
+			MessageDigest digest = MessageDigest.getInstance("SHA-256");
+			digest.reset();
+			
+			for (int i = 0; i < matrix.length; i++) {
+				for (int j = 0; j < matrix.length; j++) {
+					byte[] bool  = new byte[1];
+					bool[0] = matrix[i][j] ? (byte) 1 : (byte) 0;
+					this.commit[i][j] = digest.digest(bool);
+					digest.reset();
+				}
+			}
+		} catch(NoSuchAlgorithmException e) {
+			System.out.println("SHA-256 does not exist");
+		}
+	}
+	
+	public boolean verifyCommit(Graph g) {
+		
+		return true;
 	}
 
 	public void printCommit() {
