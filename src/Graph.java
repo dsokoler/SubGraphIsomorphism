@@ -21,6 +21,7 @@ public class Graph {
 		adjacencyMatrix = mat;
 		for(int i = 0; i < mat.length; i++) {
 			Vertex v = new Vertex();
+			v.nodeID = i;
 			for(int j = 0; j < mat[i].length; j++) {
 				if(mat[i][j] == true) {
 					v.add(j);
@@ -107,6 +108,7 @@ public class Graph {
 			Vertex v = subgraph1.get(i);
 			//System.out.println("v.size =" + v.size());
 			Vertex k = new Vertex();
+			k.nodeID = v.nodeID;
 			for (int j = 0; j < v.size(); j++) {
 				//System.out.println("v.get(j) =" + v.get(j));
 				if(contains(arr, v.get(j))) {
@@ -242,6 +244,21 @@ public class Graph {
 	}
 	
 	/*
+	 * Returns the listing of nodes in subgraph as their IDs
+	 *  in the parent graph
+	 *  @param subgraph: the subgraph to be traversed
+	 */
+	public static int[] generateSubgraphList(Graph subgraph) {
+		int[] nodes = new int[subgraph.graph.size()];
+		
+		for (int i = 0; i < subgraph.graph.size(); i++) {
+			nodes[i] = subgraph.graph.get(i).nodeID;
+		}
+		
+		return nodes;
+	}
+	
+	/*
 	 * Hash all values of the graph (committing)
 	 */
 	public Commitment commit() throws NoSuchAlgorithmException {
@@ -356,6 +373,7 @@ public class Graph {
 class Vertex {
 
 	List<Integer> v = new ArrayList<Integer>();
+	int nodeID;
 
 	void add(int i) {
 		v.add(i);
