@@ -1,3 +1,7 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -144,6 +148,86 @@ public class Graph {
 	}
 	
 	/*
+	 * Given path to a file, read the graph
+	 * FORMAT: size on first line followed by adjacency matrix of
+	 * 0's and 1's separated by spaces
+	 */
+	static Graph readGraphFromFile(String path) {
+		try(BufferedReader br = new BufferedReader(new FileReader(path))) {
+			
+			String line = br.readLine();
+			int size = Integer.parseInt(line);
+			boolean[][] matrix = new boolean[size][size];
+			
+			
+			for (int i = 0; (line = br.readLine()) != null; i++) {
+		    	String[] split = line.split(" ");
+		    	for (int j = 0; j < split.length; j++) {
+		    		if (split[j].equals("0")) {
+		    			matrix[i][j] = false;
+		    		}
+		    		else if (split[j].equals("1")) {
+		    			matrix[i][j] = true;
+		    		}
+		    		else {
+		    			//ERROR
+		    			System.out.println("Invalid file input: " + split[i]);
+		    			return null;
+		    		}
+		    	}
+		    }
+			
+			//Success case
+			return new Graph(matrix);
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+		
+		//Failure case, IOException
+		return null;
+	}
+	
+	/*
+	 * Given path to a file, read the isomorphism
+	 * FORMAT: single line of integers separated by spaces
+	 */
+	static int[] readIsomorphismFromFile(String path) {
+		try(BufferedReader br = new BufferedReader(new FileReader(path))) {
+			String line = br.readLine();
+			String[] isoString = line.split(" ");
+			int[] iso = new int[isoString.length];
+			
+			for (int i = 0; i < isoString.length; i++) {
+				iso[i] = Integer.parseInt(isoString[i]);
+			}
+			
+			//Success case
+			return iso;
+			
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+		
+		//Failure case, IOException
+		return null;
+	}
+	
+	/*
+	 * Given path to a file, read the relation between a graph it's subgraph
+	 * FORMAT: TODO
+	 */
+	static int[] readGraphRelationsFromFile(String path) {
+		try(BufferedReader br = new BufferedReader(new FileReader(path))) {
+			//TODO: READING CODE HERE			
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+		
+		//Failure case, IOException
+		return null;
+	}
+	
+	/*
 	 * Hash all values of the graph (committing)
 	 */
 	public Commitment commit() throws NoSuchAlgorithmException {
@@ -201,6 +285,8 @@ public class Graph {
 	}
 
 	public static void main(String[] args) {
+		Graph test = readGraphFromFile("testGraphReading.txt");
+		
 		boolean adjMat[][] = 
 			{
 				{true,  true,  false, false, true,  false, false, false},
@@ -213,6 +299,9 @@ public class Graph {
 				{false, true,  true,  false, false, false, true,  true}
 			};
 
+		System.out.println(Arrays.deepEquals(test.adjacencyMatrix, adjMat));
+		System.exit(1);
+		
 		Graph g = new Graph(adjMat);
 		g.printGraph();
 
