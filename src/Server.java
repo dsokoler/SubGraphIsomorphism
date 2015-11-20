@@ -93,6 +93,7 @@ public class Server
 		new Server();
 		int[] alpha = Server.G2.generateIsomorphism();
 		Graph Q = Server.G2.doIsomorphism(alpha);
+		//NEED TO GENERATE QPrime!!
 		try {
 			Commitment commit = Q.commit();
 			Server.writeObject(commit);

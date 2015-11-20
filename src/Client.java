@@ -86,6 +86,17 @@ public class Client {
 		if (challenge == 0) {
 			int[] alpha = (int[]) Client.readObject();
 			Graph Q = (Graph) Client.readObject();
+			
+			if (!Q.verifyCommitment(commit)) {
+				System.out.println("COMMITMENT VERIFICATION FAILURE");
+				System.exit(0);
+			}
+			if (!G2.verifyG2Isomorphism(alpha, Q)) {
+				System.out.println("ISOMORPHISM VERIFICATION FAILURE");
+				System.exit(0);
+			}
+			
+			System.out.println("VERIFICATION SUCCESS");
 		}
 		else if (challenge == 1) {
 			
