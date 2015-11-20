@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-
+//TODO: Change doIsomorphism to return a new graph
 
 public class Graph {
 
@@ -214,11 +214,21 @@ public class Graph {
 	
 	/*
 	 * Given path to a file, read the relation between a graph it's subgraph
-	 * FORMAT: TODO
+	 * FORMAT: integers (node numbers) separated by spaces
 	 */
-	static int[] readGraphRelationsFromFile(String path) {
+	static int[] readSubgraphRelationsFromFile(String path) {
 		try(BufferedReader br = new BufferedReader(new FileReader(path))) {
-			//TODO: READING CODE HERE			
+			String line = br.readLine();
+			String[] subString = line.split(" ");
+			int[] subgraph = new int[subString.length];
+			
+			for (int i = 0; i < subString.length; i++) {
+				subgraph[i] = Integer.parseInt(subString[i]);
+			}
+			
+			//Success case
+			return subgraph;
+			
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
@@ -299,13 +309,14 @@ public class Graph {
 				{false, true,  true,  false, false, false, true,  true}
 			};
 
-		System.out.println(Arrays.deepEquals(test.adjacencyMatrix, adjMat));
-		System.exit(1);
+		assert(Arrays.deepEquals(test.adjacencyMatrix, adjMat));
 		
 		Graph g = new Graph(adjMat);
 		g.printGraph();
 
+		int[] testIso = readIsomorphismFromFile("testIsomorphismReading.txt");
 		int[] isomorphism = {7, 2, 0, 6, 1, 4, 3, 5};
+		assert(Arrays.equals(testIso, isomorphism));
 		// 7 goes to 0, 2 goes 1, 0 goes 2 and so on
 		// 7 gets 0's column/row
 		
