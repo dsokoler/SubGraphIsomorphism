@@ -313,14 +313,18 @@ public class Graph {
 				{false, true,  true,  false, false, false, true,  true}
 			};
 
-		assert(Arrays.deepEquals(test.adjacencyMatrix, adjMat));
+		if(Arrays.deepEquals(test.adjacencyMatrix, adjMat)) {
+			System.out.println("READ FROM FILE SUCCESS");
+		}
 		
 		Graph g = new Graph(adjMat);
 		printGraph(g.graph);
 
 		int[] testIso = readIsomorphismFromFile("testIsomorphismReading.txt");
 		int[] isomorphism = {7, 2, 0, 6, 1, 4, 3, 5};
-		assert(Arrays.equals(testIso, isomorphism));
+		if(Arrays.equals(testIso, isomorphism)); {
+			System.out.println("READ FROM ISOMORPHISM SUCCESS");
+		}
 		// 7 goes to 0, 2 goes 1, 0 goes 2 and so on
 		// 7 gets 0's column/row
 		
