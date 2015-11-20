@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.List;
 
 //TODO: Change doIsomorphism to return a new graph
+//TODO: complete subgraph commitment verification
 
 public class Graph {
 
