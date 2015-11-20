@@ -21,6 +21,7 @@ public class Graph {
 		adjacencyMatrix = mat;
 		for(int i = 0; i < mat.length; i++) {
 			Vertex v = new Vertex();
+			v.nodeID = i;
 			for(int j = 0; j < mat[i].length; j++) {
 				if(mat[i][j] == true) {
 					v.add(j);
@@ -100,12 +101,18 @@ public class Graph {
 		}
 		
 		
+		//System.out.println(Arrays.toString(arr));
 		// remove connections not needed
+		//System.out.println("subgraph.size = " + subgraph1.size());
 		for (int i = 0; i < subgraph1.size(); i++) {
 			Vertex v = subgraph1.get(i);
+			//System.out.println("v.size =" + v.size());
 			Vertex k = new Vertex();
+			k.nodeID = v.nodeID;
 			for (int j = 0; j < v.size(); j++) {
+				//System.out.println("v.get(j) =" + v.get(j));
 				if(contains(arr, v.get(j))) {
+					//System.out.println("adding");
 					k.add(v.get(j));
 				}
 			}
@@ -237,6 +244,21 @@ public class Graph {
 	}
 	
 	/*
+	 * Returns the listing of nodes in subgraph as their IDs
+	 *  in the parent graph
+	 *  @param subgraph: the subgraph to be traversed
+	 */
+	public static int[] generateSubgraphList(Graph subgraph) {
+		int[] nodes = new int[subgraph.graph.size()];
+		
+		for (int i = 0; i < subgraph.graph.size(); i++) {
+			nodes[i] = subgraph.graph.get(i).nodeID;
+		}
+		
+		return nodes;
+	}
+	
+	/*
 	 * Hash all values of the graph (committing)
 	 */
 	public Commitment commit() throws NoSuchAlgorithmException {
@@ -308,14 +330,18 @@ public class Graph {
 				{false, true,  true,  false, false, false, true,  true}
 			};
 
-		assert(Arrays.deepEquals(test.adjacencyMatrix, adjMat));
+		if(Arrays.deepEquals(test.adjacencyMatrix, adjMat)) {
+			System.out.println("READ FROM FILE SUCCESS");
+		}
 		
 		Graph g = new Graph(adjMat);
 		printGraph(g.graph);
 
 		int[] testIso = readIsomorphismFromFile("testIsomorphismReading.txt");
 		int[] isomorphism = {7, 2, 0, 6, 1, 4, 3, 5};
-		assert(Arrays.equals(testIso, isomorphism));
+		if(Arrays.equals(testIso, isomorphism)); {
+			System.out.println("READ FROM ISOMORPHISM SUCCESS");
+		}
 		// 7 goes to 0, 2 goes 1, 0 goes 2 and so on
 		// 7 gets 0's column/row
 		
@@ -347,6 +373,7 @@ public class Graph {
 class Vertex {
 
 	List<Integer> v = new ArrayList<Integer>();
+	int nodeID;
 
 	void add(int i) {
 		v.add(i);
