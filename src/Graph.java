@@ -32,6 +32,10 @@ public class Graph {
 		}
 	}
 
+	Graph(List<Vertex> g) {
+		graph = g;
+	}
+
 	static void printGraph(List<Vertex> graph) {
 		System.out.printf(" ");
 		for(int i = 0; i < graph.size(); i++) {
@@ -56,7 +60,7 @@ public class Graph {
 
 
 
-	List<Vertex> doIsomorphism(int[] iso) {
+	public Graph doIsomorphism(int[] iso) {
 		List<Vertex> n = new ArrayList<Vertex>();
 		
 		// initializing arraylist to required size
@@ -86,7 +90,8 @@ public class Graph {
 			v.add(i);
 			n.set(i, v);
 		}
-		return n;
+		
+		return new Graph(n);
 	}
 
 
@@ -175,6 +180,22 @@ public class Graph {
 			}
 		}
 		return false;
+	}
+
+	public boolean[][] getAdjacencyMatrix() {
+		boolean[][] mat = new boolean[graph.size()][graph.size()];
+		for(int i =0;i < graph.size(); i++) {
+			Vertex v = graph.get(i);
+			for(int j = 0;j < graph.size(); j++) {
+				if(v.contains(j)) {
+					mat[i][j] = true;
+				}
+				else {
+					mat[i][j] = false;
+				}
+			}
+		}
+		return mat;
 	}
 	
 	/*
