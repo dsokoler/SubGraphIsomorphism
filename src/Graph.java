@@ -96,7 +96,7 @@ public class Graph {
 
 
 
-	List<Vertex> getSubgraph(int[] arr, List<Vertex>  graph) {
+	List<Vertex> getSubgraph(int[] arr) {
 		List<Vertex> subgraph1 = new ArrayList<Vertex>();
 		List<Vertex> subgraph2 = new ArrayList<Vertex>();
 		
@@ -150,6 +150,16 @@ public class Graph {
 		
 	}
 	
+	public int[] alphaPrime(int[] QPrime, Graph Q, int[] alpha, Graph G2, int[] GPrime) {
+		int[] alphaPrime = new int[QPrime.length];
+		
+		for (int node : QPrime) {
+			
+		}
+		
+		return alphaPrime;
+	}
+	
 	public int[] generateIsomorphism() {
 		int[] isomorphism = new int[this.graph.size()];
 		for (int i = 0; i < this.graph.size(); i++) {
@@ -180,6 +190,24 @@ public class Graph {
 			}
 		}
 		return false;
+	}
+	
+	/*
+	 * From G' and Alpha generate AlphaPrime
+	 * this: G'
+	 */
+	public int[] generateAlphaPrime(int[] alpha) {
+		int[] alphaPrime = new int[this.graph.size()];
+		
+		for (Vertex v : this.graph) {
+			int parentNode = v.nodeID;
+			int QPrimeNode = alpha[parentNode];
+			
+			//index is parent, value @index is child
+			alphaPrime[parentNode] = QPrimeNode;
+		}
+		
+		return alphaPrime;
 	}
 
 	public boolean[][] getAdjacencyMatrix() {
@@ -382,35 +410,7 @@ public class Graph {
 		Graph g = new Graph(adjMat);
 		printGraph(g.graph);
 
-		int[] testIso = readIsomorphismFromFile("testIsomorphismReading.txt");
-		int[] isomorphism = {7, 2, 0, 6, 1, 4, 3, 5};
-		if(Arrays.equals(testIso, isomorphism)); {
-			System.out.println("READ FROM ISOMORPHISM SUCCESS");
-		}
-		// 7 goes to 0, 2 goes 1, 0 goes 2 and so on
-		// 7 gets 0's column/row
 		
-		g.doIsomorphism(isomorphism);
-		printGraph(g.graph);
-
-
-		int[] subgraph = {1, 5, 6, 7};
-		List<Vertex> s =g.getSubgraph(subgraph, g.graph);
-		
-
-		// printing subgraph
-		printSubgraph(s, subgraph);
-		
-		System.out.println("-----------------------------");
-		try {
-			Commitment GCommit = g.commit();
-			GCommit.printCommit();
-			
-			System.out.println("Comparison of G and Commitment: " + g.verifyCommitment(GCommit));
-		} catch (NoSuchAlgorithmException e) {
-			System.out.println("SHA-256 does not exist");
-		}
-		System.out.println("-----------------------------");
 	}
 
 }
