@@ -8,8 +8,6 @@ import java.util.Arrays;
  */
 public class Commitment implements Serializable{
 
-	//CONSIDER MAKING THIS
-
 	/*
 	 * The hashed version of our initial graph's adjacency matrix
 	 * 2d array where each entry is an array of bytes

@@ -111,10 +111,6 @@ public class Graph {
 		return subgraph2;
 	}
 	
-	public Commitment commit() throws NoSuchAlgorithmException {
-		return new Commitment(this.adjacencyMatrix);
-	}
-	
 	static void printSubgraph(List<Vertex> s, int[] subgraph) {
 		System.out.printf(" ");
 		for(int i = 0; i < s.size(); i++) {
@@ -148,7 +144,15 @@ public class Graph {
 	}
 	
 	/*
-	 * Used for verifier to check the full graph they received is the same as the
+	 * Hash all values of the graph (committing)
+	 */
+	public Commitment commit() throws NoSuchAlgorithmException {
+		return new Commitment(this.adjacencyMatrix);
+	}
+	
+	/*
+	 * Verifier method
+	 * Check the full graph they received is the same as the
 	 * commitment they received earlier
 	 */
 	public boolean verifyCommitment(Commitment commit) {
@@ -158,12 +162,42 @@ public class Graph {
 	}
 	
 	/*
-	 * Used for verifier to check the subgraph they received is within
+	 * Verifier method
+	 * Check the subgraph they received is within
 	 * the commitment they received earlier
 	 */
 	public boolean verifyCommitment(Commitment commit, int[] nodes) {
+		Commitment verify = new Commitment(this.adjacencyMatrix);
+		
+		//Check if the committed values for each node in the commit
+		// match to those in the new commit
+		for (int i = 0; i < verify.size; i++) {
+			for (int j = 0; j < verify.size; j++) {
+				
+			}
+		}
 		
 		return true;
+	}
+	
+	/*
+	 * Verifier method
+	 * Apply isomorphism to G2 and check the outcome matches graph Q
+	 */
+	public boolean verifyG2Isomorphism(int[] iso, Graph Q) {
+		this.doIsomorphism(iso);
+		
+		return Arrays.deepEquals(this.adjacencyMatrix, Q.adjacencyMatrix);
+	}
+	
+	/*
+	 * Verifier method
+	 * Apply isomorphism to G1 and check the outcome matches QPrime
+	 */
+	public boolean verifyG1Isomorphism(int[] iso, Graph QPrime) {
+		this.doIsomorphism(iso);
+		
+		return Arrays.deepEquals(this.adjacencyMatrix, QPrime.adjacencyMatrix);
 	}
 
 	public static void main(String[] args) {
@@ -174,7 +208,7 @@ public class Graph {
 				{false, false, true,  true,  true,  false, true,  true},
 				{false, true,  true,  true,  false, true,  true,  false},
 				{true,  true,  true,  false, true,  true,  false, false},
-				{false, false, false, true,  true,  true,  true, false},
+				{false, false, false, true,  true,  true,  true,  false},
 				{false, false, true,  true,  false, false, true,  true},
 				{false, true,  true,  false, false, false, true,  true}
 			};
