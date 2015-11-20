@@ -74,8 +74,8 @@ public class Server
 	 * 4- hash and commit Q. Wait for bit challenge
 	 * 5- reply with requested information
 	 */
-	/*public static void main(String [] args)	{
-		new Server();
+	public static void main(String [] args)	{
+		/*new Server();
 
 		int[] a = (int[])Server.readObject();
 		System.out.println(Arrays.toString(a));
@@ -87,6 +87,10 @@ public class Server
 		Server.writeBit(0);
 		
 		
-		Server.close();
-	}*/
+		Server.close();*/
+		
+		new Server();
+		int[] alpha = Server.G2.generateIsomorphism();
+		Graph Q = Server.G2.doIsomorphism(alpha);
+	}
 }

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 //TODO: Change doIsomorphism to return a new graph
 //TODO: complete subgraph commitment verification
@@ -142,6 +143,29 @@ public class Graph {
 			System.out.println();
 		}
 		
+	}
+	
+	public int[] generateIsomorphism() {
+		int[] isomorphism = new int[this.graph.size()];
+		for (int i = 0; i < this.graph.size(); i++) {
+			isomorphism[i] = i;
+		}
+		
+		Random random = new Random();
+		for (int i = 0; i < this.graph.size(); i++) {
+			int permute = random.nextInt(this.graph.size());
+			swap(isomorphism, i, permute);
+		}
+		
+		return isomorphism;
+	}
+	
+	private static boolean swap (int[] array, int one, int two) {
+		int temp = array[one];
+		array[one] = array[two];
+		array[two] = temp;
+		
+		return true;
 	}
 	
 	public static boolean contains(int[] arr, int k) {

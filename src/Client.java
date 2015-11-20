@@ -60,13 +60,12 @@ public class Client {
 	}
 
 	/*
-	 * 1- send intialization (some predetermined value), then wait for commitment
-	 * 2- reply with random bit, 1 or 0
-	 * 3- wait for reply, verify reply
+	 * 1- reply with random bit, 1 or 0
+	 * 2- wait for reply, verify reply
 	 */
-	/*public static void main(String[] arg) {
+	public static void main(String[] arg) {
 
-		int[] arr = {1, 2, 7};
+		/*int[] arr = {1, 2, 7};
 		new Client();
 		Client.writeObject(arr);
 
@@ -75,10 +74,13 @@ public class Client {
 		Client.writeBit(1);
 		
 		System.out.println(readBit());
-		System.out.println(readBit());
+		System.out.println(readBit());*/
+		
+		new Client();
+		Commitment commit = (Commitment) Client.readObject();
 		
 		
 
 		Client.close();
-	}*/
+	}
 }
