@@ -9,6 +9,8 @@ public class Server
 	Socket pipe ;
 	static ObjectInputStream serverInputStream;
 	static ObjectOutputStream serverOutputStream;
+	static Graph G1, G2, GPrime;
+	static int[] gamma, G2toGPrime;
 
 	Server() {
 		try {
@@ -16,6 +18,13 @@ public class Server
 			pipe = socketConnection.accept();
 			serverInputStream = new ObjectInputStream(pipe.getInputStream());
 			serverOutputStream = new ObjectOutputStream(pipe.getOutputStream());
+			
+			G1 = Graph.readGraphFromFile("G1.txt");
+			G2 = Graph.readGraphFromFile("G2.txt");
+			GPrime = Graph.readGraphFromFile("GPrime.txt");
+			
+			gamma = Graph.readIsomorphismFromFile("gamma.txt");
+			G2toGPrime = Graph.readSubgraphRelationsFromFile("G2toGPrime.txt");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -7,12 +7,16 @@ public class Client {
 	static Socket socketConnection;
 	static ObjectOutputStream clientOutputStream;
 	static ObjectInputStream clientInputStream;
+	static Graph G1, G2;
 
 	Client() {
 		try {
 			socketConnection = new Socket("127.0.0.1", 11111);
 			clientOutputStream = new ObjectOutputStream(socketConnection.getOutputStream());
 			clientInputStream = new ObjectInputStream(socketConnection.getInputStream());
+			
+			G1 = Graph.readGraphFromFile("G1.txt");
+			G2 = Graph.readGraphFromFile("G2.txt");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}	
