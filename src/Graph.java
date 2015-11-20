@@ -30,7 +30,7 @@ public class Graph {
 		}
 	}
 
-	void printGraph() {
+	static void printGraph(List<Vertex> graph) {
 		System.out.printf(" ");
 		for(int i = 0; i < graph.size(); i++) {
 			System.out.printf(" %d", i);
@@ -53,7 +53,8 @@ public class Graph {
 	}
 
 
-	void doIsomorphism(int[] iso) {
+
+	List<Vertex> doIsomorphism(int[] iso) {
 		List<Vertex> n = new ArrayList<Vertex>();
 		
 		// initializing arraylist to required size
@@ -83,10 +84,12 @@ public class Graph {
 			v.add(i);
 			n.set(i, v);
 		}
-		graph = n;
+		return n;
 	}
 
-	List<Vertex> getSubgraph(int[] arr) {
+
+
+	List<Vertex> getSubgraph(int[] arr, List<Vertex>  graph) {
 		List<Vertex> subgraph1 = new ArrayList<Vertex>();
 		List<Vertex> subgraph2 = new ArrayList<Vertex>();
 		
@@ -313,7 +316,7 @@ public class Graph {
 		assert(Arrays.deepEquals(test.adjacencyMatrix, adjMat));
 		
 		Graph g = new Graph(adjMat);
-		g.printGraph();
+		printGraph(g.graph);
 
 		int[] testIso = readIsomorphismFromFile("testIsomorphismReading.txt");
 		int[] isomorphism = {7, 2, 0, 6, 1, 4, 3, 5};
@@ -322,11 +325,11 @@ public class Graph {
 		// 7 gets 0's column/row
 		
 		g.doIsomorphism(isomorphism);
-		g.printGraph();
+		printGraph(g.graph);
 
 
 		int[] subgraph = {1, 5, 6, 7};
-		List<Vertex> s =g.getSubgraph(subgraph);
+		List<Vertex> s =g.getSubgraph(subgraph, g.graph);
 		
 
 		// printing subgraph
