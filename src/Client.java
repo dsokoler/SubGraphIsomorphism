@@ -55,6 +55,11 @@ public class Client {
 		}
 	}
 
+	/*
+	 * 1- send intialization (some predetermined value), then wait for commitment
+	 * 2- reply with random bit, 1 or 0
+	 * 3- wait for reply, verify reply
+	 */
 	/*public static void main(String[] arg) {
 
 		int[] arr = {1, 2, 7};
