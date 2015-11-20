@@ -1,4 +1,5 @@
 import java.net.*;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.io.*;
 
@@ -92,5 +93,25 @@ public class Server
 		new Server();
 		int[] alpha = Server.G2.generateIsomorphism();
 		Graph Q = Server.G2.doIsomorphism(alpha);
+		try {
+			Commitment commit = Q.commit();
+			Server.writeObject(commit);
+		} catch (NoSuchAlgorithmException e) {
+			System.out.println("NoSuchAlgorithmException");
+			e.printStackTrace();
+			System.exit(0);
+		}
+		int challenge = Server.readBit();
+		if (challenge == 0) {
+			Server.writeObject(alpha);
+			Server.writeObject(Q);
+		}
+		else if (challenge == 1) {
+			
+		}
+		else {
+			System.out.println("Invalid Challenge: " + challenge);
+			System.exit(0);
+		}
 	}
 }

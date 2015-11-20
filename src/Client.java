@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.*;
 import java.util.Arrays;
+import java.util.Random;
 
 public class Client {
 
@@ -78,6 +79,21 @@ public class Client {
 		
 		new Client();
 		Commitment commit = (Commitment) Client.readObject();
+		Random random = new Random();
+		int challenge = random.nextInt();
+		Client.writeBit(challenge);
+		
+		if (challenge == 0) {
+			int[] alpha = (int[]) Client.readObject();
+			Graph Q = (Graph) Client.readObject();
+		}
+		else if (challenge == 1) {
+			
+		}
+		else {
+			System.out.println("Invalid challenge: " + challenge);
+			System.exit(0);
+		}
 		
 		
 
