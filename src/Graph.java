@@ -60,7 +60,10 @@ public class Graph {
 
 
 
-	public Graph doIsomorphism(int[] iso) {
+	public static Graph doIsomorphism(int[] iso, List<Vertex> graph) {
+		
+		
+				
 		List<Vertex> n = new ArrayList<Vertex>();
 		
 		// initializing arraylist to required size
@@ -72,10 +75,11 @@ public class Graph {
 		// fix individual positions
 		for(int i = 0; i < graph.size(); i++) {
 			Vertex v = graph.get(i);
-			//System.out.println("iso[i] = " + iso[i]);
-			//v.print();
-			v.remove(i);
-			//v.add(iso[i]);
+			v.sort();
+			System.out.println("iso[i] = " + iso[i] + "and i = " + i);
+			v.print();
+			if(v.contains(i)) v.remove(i);
+			v.add(iso[i]);
 			n.set(iso[i], v);
 			changes[i] = iso[i];
 		}
@@ -99,6 +103,7 @@ public class Graph {
 	List<Vertex> getSubgraph(int[] arr) {
 		List<Vertex> subgraph1 = new ArrayList<Vertex>();
 		List<Vertex> subgraph2 = new ArrayList<Vertex>();
+		List<Vertex> subgraph3 = new ArrayList<Vertex>();
 		
 		// add all connections
 		for(int i =0; i < arr.length; i++) {
@@ -112,6 +117,7 @@ public class Graph {
 		//System.out.println("subgraph.size = " + subgraph1.size());
 		for (int i = 0; i < subgraph1.size(); i++) {
 			Vertex v = subgraph1.get(i);
+			v.sort();
 			//System.out.println("v.size =" + v.size());
 			Vertex k = new Vertex();
 			k.nodeID = v.nodeID;
@@ -122,9 +128,24 @@ public class Graph {
 					k.add(v.get(j));
 				}
 			}
+			//System.out.println("k.print = ");
+			//k.print();
 			subgraph2.add(k);
 		}
-		return subgraph2;
+		
+		for (int i = 0; i < subgraph2.size(); i++) {
+			Vertex v = subgraph2.get(i);
+			Vertex u = new Vertex();
+			for (int j = 0; j < v.size(); j++) {
+				int k = v.get(j);
+				int l = searchForElement(arr, k);
+				System.out.println("j = " + j + " vertex = " + k + " index in arr = " + l);
+				u.add(l);
+			}
+			subgraph3.add(u);
+		}
+		
+		return subgraph3;
 	}
 	
 	static void printSubgraph(List<Vertex> s, int[] subgraph) {
@@ -149,15 +170,41 @@ public class Graph {
 		}
 		
 	}
+	/*
+	 * returns index 
+	 */
+	 static int searchForElement(int[] arr, int element) {
+		for (int i = 0; i < arr.length; i++) {
+			if(arr[i] == element) {
+				return i;
+			}
+		}
+		return -1;
+	 }
 	
-	public int[] alphaPrime(int[] QPrime, Graph Q, int[] alpha, Graph G2, int[] GPrime) {
-		int[] alphaPrime = new int[QPrime.length];
+	public static int[] getalphaPrime(int[] subgraph2, int[] alpha, int[] subgraph1) {
 		
-		for (int node : QPrime) {
-			
+		int[] x = new int[subgraph2.length];
+		
+		// getting subgraph2 vertices in G2
+		for (int i = 0; i < subgraph2.length; i++) {
+			int k = searchForElement(alpha, subgraph2[i]);
+			x[i] = k;
+		}
+		System.out.println("x =" + Arrays.toString(x));
+		
+		
+		// comparing those vertices to subgraph1
+		int[] alphaP = new int[subgraph1.length];
+		for (int i = 0; i < subgraph1.length; i++) {
+			int k = searchForElement(x, subgraph1[i]);
+			alphaP[i] = k;
 		}
 		
-		return alphaPrime;
+		System.out.println("alphaP =" + Arrays.toString(alphaP));
+		
+		return alphaP;
+		
 	}
 	
 	public int[] generateIsomorphism() {
@@ -192,24 +239,6 @@ public class Graph {
 		return false;
 	}
 	
-	/*
-	 * From G' and Alpha generate AlphaPrime
-	 * this: G'
-	 */
-	public int[] generateAlphaPrime(int[] alpha) {
-		int[] alphaPrime = new int[this.graph.size()];
-		
-		for (Vertex v : this.graph) {
-			int parentNode = v.nodeID;
-			int QPrimeNode = alpha[parentNode];
-			
-			//index is parent, value @index is child
-			alphaPrime[parentNode] = QPrimeNode;
-		}
-		
-		return alphaPrime;
-	}
-
 	public boolean[][] getAdjacencyMatrix() {
 		boolean[][] mat = new boolean[graph.size()][graph.size()];
 		for(int i =0;i < graph.size(); i++) {
@@ -373,7 +402,7 @@ public class Graph {
 	 * Apply isomorphism to G2 and check the outcome matches graph Q
 	 */
 	public boolean verifyG2Isomorphism(int[] iso, Graph Q) {
-		this.doIsomorphism(iso);
+		doIsomorphism(iso, this.graph);
 		
 		return Arrays.deepEquals(this.adjacencyMatrix, Q.adjacencyMatrix);
 	}
@@ -383,13 +412,23 @@ public class Graph {
 	 * Apply isomorphism to G1 and check the outcome matches QPrime
 	 */
 	public boolean verifyG1Isomorphism(int[] iso, Graph QPrime) {
-		this.doIsomorphism(iso);
+		doIsomorphism(iso, this.graph);
 		
 		return Arrays.deepEquals(this.adjacencyMatrix, QPrime.adjacencyMatrix);
 	}
+	
+	static int[] addIsomorphism(int[] iso1, int[] iso2) {
+        
+        int[] isof = new int[iso1.length];
+        for(int i =0; i <iso1.length; i++) {
+            isof[i] = iso2[iso1[i]];            
+        }
+        return isof;
+    }
+
 
 	public static void main(String[] args) {
-		Graph test = readGraphFromFile("testGraphReading.txt");
+		/*Graph test = readGraphFromFile("testGraphReading.txt");
 		
 		boolean adjMat[][] = 
 			{
@@ -408,9 +447,60 @@ public class Graph {
 		}
 		
 		Graph g = new Graph(adjMat);
-		printGraph(g.graph);
-
+		printGraph(g.graph);*/
 		
+		boolean adjMat[][] = 
+			{
+				{true,  true,  false, false, true,  false, false, false},
+				{true,  true,  false, true,  true,  false, false, true},
+				{false, false, true,  true,  true,  false, true,  true},
+				{false, true,  true,  true,  false, true,  true,  false},
+				{true,  true,  true,  false, true,  true,  false, false},
+				{false, false, false, true,  true,  true,  true,  false},
+				{false, false, true,  true,  false, false, true,  true},
+				{false, true,  true,  false, false, false, true,  true}
+			};
+		
+		Graph g2 = new Graph(adjMat);
+		
+		int[] alpha = {7, 2, 0, 6, 1, 4, 3, 5};
+		printGraph(g2.graph);
+		
+		Graph g3 = new Graph(adjMat);
+		
+		
+		Graph Q = doIsomorphism(alpha, g3.graph);
+		System.out.println("g2");
+		printGraph(g2.graph);
+		System.out.println("Proxy");
+		printGraph(g3.graph);
+		
+		
+		System.out.println("graph Q = ");
+		printGraph(Q.graph);
+		
+		int[] subGraph2 = {0, 1, 4, 6};
+		
+		List<Vertex> QPrime = Q.getSubgraph(subGraph2);
+		
+		System.out.println("graph QPrime = ");
+		printSubgraph(QPrime, subGraph2);
+		
+		
+		printGraph(g2.graph);
+		int[] subGraph1 = {2, 3, 4, 5};
+		List<Vertex> GPrime = g2.getSubgraph(subGraph1);
+		
+		System.out.println("graph GPrime = ");
+		printSubgraph(GPrime, subGraph1);
+		
+		
+		int[] alphaP = getalphaPrime(subGraph2,alpha, subGraph1);
+		System.out.println("alphaP = " + Arrays.toString(alphaP));
+		
+		Graph QPrime_1 = doIsomorphism(alphaP, GPrime);
+		printGraph(QPrime_1.graph);
+				
 	}
 
 }
@@ -434,6 +524,20 @@ class Vertex {
 
 	Integer get(int i) {
 		return v.get(i);
+	}
+	
+	void sort() {
+		Collections.sort(v);	
+		
+	}
+	
+	int getIndex(int element) {
+		for (int i = 0; i < v.size(); i++) {
+			if(v.get(i) == element) {
+				return i;
+			}
+		}
+		return -1;
 	}
 
 	boolean contains(int i) {
