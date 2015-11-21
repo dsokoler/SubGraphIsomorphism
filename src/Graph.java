@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,10 +12,12 @@ import java.util.Random;
 
 //TODO: complete subgraph commitment verification
 
-public class Graph {
+public class Graph implements Serializable {
+
+	private static final long serialVersionUID = 3487350136963141267L;
 
 	List<Vertex> graph = new ArrayList<Vertex>();
-	
+
 	boolean[][] adjacencyMatrix;
 
 	Graph(boolean[][] mat) {
@@ -58,17 +61,21 @@ public class Graph {
 		}
 	}
 
-
+	/*
+	 * Before you call this function, make a new Graph object using new(Graph g) constructor and 
+	 * send the new object.graph into this function so as to retain the structure of the original
+	 * graph in the pre-existing object.
+	 */
 
 	public static Graph doIsomorphism(int[] iso, List<Vertex> graph) {
-		
-		
-				
+
+
+
 		List<Vertex> n = new ArrayList<Vertex>();
-		
+
 		// initializing arraylist to required size
 		for (int i = 0; i < graph.size(); i++) {
-		    n.add(null);
+			n.add(null);
 		}
 		int[] changes = new int[graph.size()];
 
@@ -76,14 +83,19 @@ public class Graph {
 		for(int i = 0; i < graph.size(); i++) {
 			Vertex v = graph.get(i);
 			v.sort();
-			System.out.println("iso[i] = " + iso[i] + "and i = " + i);
-			v.print();
-			if(v.contains(i)) v.remove(i);
+			//System.out.println("iso[i] = " + iso[i] + "and i = " + i);
+			//v.print();
+			if(v.contains(i)) {
+				v.remove(i);
+			}
 			v.add(iso[i]);
 			n.set(iso[i], v);
 			changes[i] = iso[i];
 		}
-
+		
+		
+		//printGraph(n);
+		
 		// fix relative positions
 		for (int i = 0; i < n.size(); i++) {
 			Vertex v = n.get(i);
@@ -94,7 +106,7 @@ public class Graph {
 			v.add(i);
 			n.set(i, v);
 		}
-		
+
 		return new Graph(n);
 	}
 
@@ -104,14 +116,14 @@ public class Graph {
 		List<Vertex> subgraph1 = new ArrayList<Vertex>();
 		List<Vertex> subgraph2 = new ArrayList<Vertex>();
 		List<Vertex> subgraph3 = new ArrayList<Vertex>();
-		
+
 		// add all connections
 		for(int i =0; i < arr.length; i++) {
 			Vertex v = graph.get(arr[i]);
 			subgraph1.add(v);
 		}
-		
-		
+
+
 		//System.out.println(Arrays.toString(arr));
 		// remove connections not needed
 		//System.out.println("subgraph.size = " + subgraph1.size());
@@ -132,10 +144,11 @@ public class Graph {
 			//k.print();
 			subgraph2.add(k);
 		}
-		
+
 		for (int i = 0; i < subgraph2.size(); i++) {
 			Vertex v = subgraph2.get(i);
 			Vertex u = new Vertex();
+			u.nodeID = v.nodeID;
 			for (int j = 0; j < v.size(); j++) {
 				int k = v.get(j);
 				int l = searchForElement(arr, k);
@@ -144,10 +157,10 @@ public class Graph {
 			}
 			subgraph3.add(u);
 		}
-		
+
 		return subgraph3;
 	}
-	
+
 	static void printSubgraph(List<Vertex> s, int[] subgraph) {
 		System.out.printf(" ");
 		for(int i = 0; i < s.size(); i++) {
@@ -168,68 +181,110 @@ public class Graph {
 			}
 			System.out.println();
 		}
-		
+
 	}
 	/*
 	 * returns index 
 	 */
-	 static int searchForElement(int[] arr, int element) {
+	static int searchForElement(int[] arr, int element) {
 		for (int i = 0; i < arr.length; i++) {
 			if(arr[i] == element) {
 				return i;
 			}
 		}
 		return -1;
-	 }
-	
+	}
+
+	/*
+	 * subgraph1: G2-> G'
+	 * subgraph2: Q -> Q'
+	 */
 	public static int[] getalphaPrime(int[] subgraph2, int[] alpha, int[] subgraph1) {
-		
+
+		//G' vertices in G2
 		int[] x = new int[subgraph2.length];
+
+		System.out.println(Arrays.toString(subgraph2));
 		
 		// getting subgraph2 vertices in G2
 		for (int i = 0; i < subgraph2.length; i++) {
 			int k = searchForElement(alpha, subgraph2[i]);
+			if (k == -1) {
+				System.out.println("SearchForElement Error");
+				System.exit(0);
+			}
 			x[i] = k;
 		}
 		System.out.println("x =" + Arrays.toString(x));
-		
-		
-		// comparing those vertices to subgraph1
+		System.out.println("subgraph1 = " + Arrays.toString(subgraph1));
+
+		// comparing those vertices to subgraph 1 (G')
 		int[] alphaP = new int[subgraph1.length];
 		for (int i = 0; i < subgraph1.length; i++) {
 			int k = searchForElement(x, subgraph1[i]);
 			alphaP[i] = k;
 		}
-		
+
 		System.out.println("alphaP =" + Arrays.toString(alphaP));
-		
+
 		return alphaP;
-		
+
 	}
-	
+
+	/*
+	 * CALLED ONLY WITH this AS G2
+	 */
+	public Graph generateQPrime(Graph Q, int[] GPrimetoG2, int[] alpha) {
+		int[] alphaPrime = new int[GPrimetoG2.length];
+
+		for (int i = 0; i < GPrimetoG2.length; i++) {
+			int nodeInG2 = GPrimetoG2[i];
+			alphaPrime[i] = alpha[nodeInG2];
+		}
+
+		List<Vertex> QPrimeList = Q.getSubgraph(alphaPrime);
+		System.out.println("alphaPrimeTest: " + Arrays.toString(alphaPrime));
+		Graph QPrime = new Graph(QPrimeList);
+
+		//alphaPrime(G') == Q sub alphaPrime?????????
+
+		return QPrime;
+	}
+
+
+	public static int[] genSubgraph2(int[] sub1, int[] alpha) {
+		int[] sub2 = new int[sub1.length];
+
+		for (int i = 0; i < sub1.length; i++) {
+			sub2[i] = alpha[sub1[i]];
+		}
+		return sub2;
+
+	}
+
 	public int[] generateIsomorphism() {
 		int[] isomorphism = new int[this.graph.size()];
 		for (int i = 0; i < this.graph.size(); i++) {
 			isomorphism[i] = i;
 		}
-		
+
 		Random random = new Random();
 		for (int i = 0; i < this.graph.size(); i++) {
 			int permute = random.nextInt(this.graph.size());
 			swap(isomorphism, i, permute);
 		}
-		
+
 		return isomorphism;
 	}
-	
+
 	private static boolean swap (int[] array, int one, int two) {
 		int temp = array[one];
 		array[one] = array[two];
 		array[two] = temp;
-		
+
 		return true;
 	}
-	
+
 	public static boolean contains(int[] arr, int k) {
 		for(int i =0; i < arr.length; i++) {
 			if(k == arr[i]) {
@@ -238,7 +293,7 @@ public class Graph {
 		}
 		return false;
 	}
-	
+
 	public static boolean[][] getAdjacencyMatrix(List<Vertex> graph) {
 		boolean[][] mat = new boolean[graph.size()][graph.size()];
 		for(int i =0;i < graph.size(); i++) {
@@ -254,7 +309,7 @@ public class Graph {
 		}
 		return mat;
 	}
-	
+
 	/*
 	 * Given path to a file, read the graph
 	 * FORMAT: size on first line followed by adjacency matrix of
@@ -262,39 +317,39 @@ public class Graph {
 	 */
 	static Graph readGraphFromFile(String path) {
 		try(BufferedReader br = new BufferedReader(new FileReader(path))) {
-			
+
 			String line = br.readLine();
 			int size = Integer.parseInt(line);
 			boolean[][] matrix = new boolean[size][size];
-			
-			
+
+
 			for (int i = 0; (line = br.readLine()) != null; i++) {
-		    	String[] split = line.split(" ");
-		    	for (int j = 0; j < split.length; j++) {
-		    		if (split[j].equals("0")) {
-		    			matrix[i][j] = false;
-		    		}
-		    		else if (split[j].equals("1")) {
-		    			matrix[i][j] = true;
-		    		}
-		    		else {
-		    			//ERROR
-		    			System.out.println("Invalid file input: " + split[i]);
-		    			return null;
-		    		}
-		    	}
-		    }
-			
+				String[] split = line.split(" ");
+				for (int j = 0; j < split.length; j++) {
+					if (split[j].equals("0")) {
+						matrix[i][j] = false;
+					}
+					else if (split[j].equals("1")) {
+						matrix[i][j] = true;
+					}
+					else {
+						//ERROR
+						System.out.println("Invalid file input: " + split[i]);
+						return null;
+					}
+				}
+			}
+
 			//Success case
 			return new Graph(matrix);
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		//Failure case, IOException
 		return null;
 	}
-	
+
 	/*
 	 * Given path to a file, read the isomorphism
 	 * FORMAT: single line of integers separated by spaces
@@ -304,22 +359,22 @@ public class Graph {
 			String line = br.readLine();
 			String[] isoString = line.split(" ");
 			int[] iso = new int[isoString.length];
-			
+
 			for (int i = 0; i < isoString.length; i++) {
 				iso[i] = Integer.parseInt(isoString[i]);
 			}
-			
+
 			//Success case
 			return iso;
-			
+
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		//Failure case, IOException
 		return null;
 	}
-	
+
 	/*
 	 * Given path to a file, read the relation between a graph it's subgraph
 	 * FORMAT: integers (node numbers) separated by spaces
@@ -329,22 +384,22 @@ public class Graph {
 			String line = br.readLine();
 			String[] subString = line.split(" ");
 			int[] subgraph = new int[subString.length];
-			
+
 			for (int i = 0; i < subString.length; i++) {
 				subgraph[i] = Integer.parseInt(subString[i]);
 			}
-			
+
 			//Success case
 			return subgraph;
-			
+
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		//Failure case, IOException
 		return null;
 	}
-	
+
 	/*
 	 * Returns the listing of nodes in subgraph as their IDs
 	 *  in the parent graph
@@ -352,21 +407,22 @@ public class Graph {
 	 */
 	public static int[] generateSubgraphList(Graph subgraph) {
 		int[] nodes = new int[subgraph.graph.size()];
-		
+
 		for (int i = 0; i < subgraph.graph.size(); i++) {
 			nodes[i] = subgraph.graph.get(i).nodeID;
+			System.out.printf("Node %d id: %d\n", i, nodes[i]);
 		}
-		
+
 		return nodes;
 	}
-	
+
 	/*
 	 * Hash all values of the graph (committing)
 	 */
 	public Commitment commit() throws NoSuchAlgorithmException {
 		return new Commitment(this.adjacencyMatrix);
 	}
-	
+
 	/*
 	 * Verifier method
 	 * Check the full graph they received is the same as the
@@ -374,10 +430,10 @@ public class Graph {
 	 */
 	public boolean verifyCommitment(Commitment commit) {
 		Commitment verify = new Commitment(this.adjacencyMatrix);
-		
+
 		return Arrays.deepEquals(verify.commit, commit.commit);
 	}
-	
+
 	/*
 	 * Verifier method
 	 * Check the subgraph they received is within
@@ -385,11 +441,11 @@ public class Graph {
 	 */
 	public boolean isSubgraph(Commitment commit, int[] graphRelations) throws NoSuchAlgorithmException {
 		Commitment subCommit = this.commit();
-		
+
 		//subCommit[i][j] is the hash of the Q' node
 		//commit[node][k] is what we are comparing to (hash of Q node)
 		int i = 0, j = 0, k = 0;
-		
+
 		//i represents the node we are looking at
 		for (i = 0; i < subCommit.size; i++) {
 			while (j < subCommit.size && k < commit.size) {
@@ -405,47 +461,56 @@ public class Graph {
 				return false;
 			}
 		}
-		
+
 		if (k == commit.size && i == subCommit.size) {
 			return true;
 		}
-		
+
 		return false;
 	}
-	
+
 	/*
 	 * Verifier method
 	 * Apply isomorphism to G2 and check the outcome matches graph Q
+	 * this: G2
 	 */
 	public boolean verifyG2Isomorphism(int[] iso, Graph Q) {
-		doIsomorphism(iso, this.graph);
+		Graph.printGraph(this.graph);
+		System.out.println(Arrays.toString(iso));	
 		
-		return Arrays.deepEquals(this.adjacencyMatrix, Q.adjacencyMatrix);
+		//Temp is G2
+		Graph temp = new Graph(this.graph);
+		doIsomorphism(iso, temp.graph);
+		Graph.printGraph(temp.graph);
+
+		return Arrays.deepEquals(temp.adjacencyMatrix, Q.adjacencyMatrix);
 	}
-	
+
 	/*
 	 * Verifier method
 	 * Apply isomorphism to G1 and check the outcome matches QPrime
+	 * this: G1
 	 */
 	public boolean verifyG1Isomorphism(int[] iso, Graph QPrime) {
-		doIsomorphism(iso, this.graph);
-		
-		return Arrays.deepEquals(this.adjacencyMatrix, QPrime.adjacencyMatrix);
+		Graph temp = new Graph(this.graph);
+		doIsomorphism(iso, temp.graph);
+
+		return Arrays.deepEquals(temp.adjacencyMatrix, QPrime.adjacencyMatrix);
 	}
-	
+
 	static int[] addIsomorphism(int[] iso1, int[] iso2) {
-        
-        int[] isof = new int[iso1.length];
-        for(int i =0; i <iso1.length; i++) {
-            isof[i] = iso2[iso1[i]];            
-        }
-        return isof;
-    }
+
+		int[] isof = new int[iso1.length];
+		for(int i =0; i <iso1.length; i++) {
+			isof[i] = iso2[iso1[i]];            
+		}
+		return isof;
+	}
 
 
 	public static void main(String[] args) {
 		/*Graph test = readGraphFromFile("testGraphReading.txt");
-		
+
 		boolean adjMat[][] = 
 			{
 				{true,  true,  false, false, true,  false, false, false},
@@ -461,10 +526,10 @@ public class Graph {
 		if(Arrays.deepEquals(test.adjacencyMatrix, adjMat)) {
 			System.out.println("READ FROM FILE SUCCESS");
 		}
-		
+
 		Graph g = new Graph(adjMat);
-		printGraph(g.graph);*/
-		
+		printGraph(g.graph);
+		 */
 		boolean adjMat[][] = 
 			{
 				{true,  true,  false, false, true,  false, false, false},
@@ -476,53 +541,61 @@ public class Graph {
 				{false, false, true,  true,  false, false, true,  true},
 				{false, true,  true,  false, false, false, true,  true}
 			};
-		
+
 		Graph g2 = new Graph(adjMat);
-		
+
 		int[] alpha = {7, 2, 0, 6, 1, 4, 3, 5};
 		printGraph(g2.graph);
-		
+
 		Graph g3 = new Graph(adjMat);
-		
-		
+
+
 		Graph Q = doIsomorphism(alpha, g3.graph);
 		System.out.println("g2");
 		printGraph(g2.graph);
-		System.out.println("Proxy");
+		System.out.println("g3");
 		printGraph(g3.graph);
-		
-		
+
+		/*
 		System.out.println("graph Q = ");
 		printGraph(Q.graph);
-		
+
 		int[] subGraph2 = {0, 1, 4, 6};
-		
+
 		List<Vertex> QPrime = Q.getSubgraph(subGraph2);
-		
+
 		System.out.println("graph QPrime = ");
 		printSubgraph(QPrime, subGraph2);
-		
-		
+
+
 		printGraph(g2.graph);
 		int[] subGraph1 = {2, 3, 4, 5};
 		List<Vertex> GPrime = g2.getSubgraph(subGraph1);
-		
+
 		System.out.println("graph GPrime = ");
 		printSubgraph(GPrime, subGraph1);
-		
-		
+
+
 		int[] alphaP = getalphaPrime(subGraph2,alpha, subGraph1);
 		System.out.println("alphaP = " + Arrays.toString(alphaP));
-		
+
 		Graph QPrime_1 = doIsomorphism(alphaP, GPrime);
 		printGraph(QPrime_1.graph);
-				
+
 	}
 
+		int[] sub1 = {2, 3, 4, 5};
+		int[] alpha = {7, 2, 0, 6, 1, 4, 3, 5};
+		int[] sub2 = genSubgraph2(sub1, alpha);
+		System.out.println(Arrays.toString(sub2));
+		 */
+	}
 }
 
-class Vertex {
+class Vertex implements Serializable {
 
+	private static final long serialVersionUID = 1L;
+	
 	List<Integer> v = new ArrayList<Integer>();
 	int nodeID;
 
@@ -541,12 +614,12 @@ class Vertex {
 	Integer get(int i) {
 		return v.get(i);
 	}
-	
+
 	void sort() {
 		Collections.sort(v);	
-		
+
 	}
-	
+
 	int getIndex(int element) {
 		for (int i = 0; i < v.size(); i++) {
 			if(v.get(i) == element) {

@@ -14,7 +14,7 @@ public class Client {
 
 	Client() {
 		try {
-			socketConnection = new Socket("127.0.0.1", 11111);
+			socketConnection = new Socket("127.0.0.1", 34695);
 			clientOutputStream = new ObjectOutputStream(socketConnection.getOutputStream());
 			clientInputStream = new ObjectInputStream(socketConnection.getInputStream());
 			
@@ -82,7 +82,8 @@ public class Client {
 		new Client();
 		Commitment commit = (Commitment) Client.readObject();
 		Random random = new Random();
-		int challenge = random.nextInt();
+		//int challenge = random.nextInt();
+		int challenge = 0;
 		Client.writeBit(challenge);
 		
 		if (challenge == 0) {
@@ -106,7 +107,8 @@ public class Client {
 			int[] pi = (int[]) Client.readObject();
 			int[] QPrimeinQ = (int[]) Client.readObject();
 			
-			Graph QPrime = Graph.doIsomorphism(pi, G1.graph); 
+			Graph temp = new Graph(G1.graph);
+			Graph QPrime = Graph.doIsomorphism(pi, temp.graph); 
 
 			//Verify Q' is among the committed values
 			if (QPrime.isSubgraph(commit, QPrimeinQ)) {

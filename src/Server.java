@@ -16,10 +16,7 @@ public class Server
 
 	Server() {
 		try {
-			socketConnection = new ServerSocket(11111);
-			pipe = socketConnection.accept();
-			serverInputStream = new ObjectInputStream(pipe.getInputStream());
-			serverOutputStream = new ObjectOutputStream(pipe.getOutputStream());
+			socketConnection = new ServerSocket(34695);
 			
 			G1 = Graph.readGraphFromFile("G1.txt");
 			G2 = Graph.readGraphFromFile("G2.txt");
@@ -27,8 +24,13 @@ public class Server
 			
 			gamma = Graph.readIsomorphismFromFile("gamma.txt");
 			G2toGPrime = Graph.readSubgraphRelationsFromFile("G2toGPrime.txt");
+			
+			pipe = socketConnection.accept();
+			serverInputStream = new ObjectInputStream(pipe.getInputStream());
+			serverOutputStream = new ObjectOutputStream(pipe.getOutputStream());
 		} catch (IOException e) {
 			e.printStackTrace();
+			System.exit(0);
 		}
 	}
 
@@ -91,16 +93,26 @@ public class Server
 		
 		Server.close();*/
 		
-		new Server();		
-		int[] alpha = G2.generateIsomorphism();
-		Q = Graph.doIsomorphism(alpha, G2.graph);
+		new Server();
 		
-		//What is the array to pass to the get subgraph method?
-		List<Vertex> QPrimeList = Q.getSubgraph(arr);
-		QPrime = new Graph(QPrimeList);
+		//Generate alpha (G2 -> Q)
+		//int[] alpha = G2.generateIsomorphism();
+		int[] alpha = {7, 6, 5, 4, 3, 2, 1, 0};
 		
-		//Which subgraph is which (G' or Q'?) (One is nodes of Q that are in Q', otheris G2toGPrime)
-		alphaPrime = Graph.getalphaPrime(subgraph2, alpha, subgraph1);
+		//Generate Q by alpha(G2)
+		Graph temp = new Graph(G2.graph);
+		Q = Graph.doIsomorphism(alpha, temp.graph);
+		
+		Graph.printGraph(G2.graph);
+		System.out.println(Arrays.toString(alpha));
+		Graph.printGraph(Q.graph);
+		System.out.println();
+		
+		//Generate QPrime through G'->G2->Q)
+		QPrime = G2.generateQPrime(Q, Server.G2toGPrime, alpha);
+		
+		//Generate alpha' through Q' -> alpha -> G'
+		alphaPrime = Graph.getalphaPrime(Graph.generateSubgraphList(QPrime), alpha, Graph.generateSubgraphList(GPrime));
 		
 		try {
 			Commitment commit = Q.commit();
