@@ -1,6 +1,7 @@
 import java.net.*;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.List;
 import java.io.*;
 
 
@@ -10,8 +11,8 @@ public class Server
 	Socket pipe ;
 	static ObjectInputStream serverInputStream;
 	static ObjectOutputStream serverOutputStream;
-	static Graph G1, G2, GPrime;
-	static int[] gamma, G2toGPrime;
+	static Graph G1, G2, GPrime, Q, QPrime;
+	static int[] gamma, G2toGPrime, QtoQPrime, alphaPrime;
 
 	Server() {
 		try {
@@ -90,9 +91,16 @@ public class Server
 		
 		Server.close();*/
 		
-		new Server();
-		int[] alpha = Server.G2.generateIsomorphism();
-		Graph Q = Server.G2.doIsomorphism(alpha);
+		new Server();		
+		int[] alpha = G2.generateIsomorphism();
+		Q = Graph.doIsomorphism(alpha, G2.graph);
+		
+		//What is the array to pass to the get subgraph method?
+		List<Vertex> QPrimeList = Q.getSubgraph(arr);
+		QPrime = new Graph(QPrimeList);
+		
+		//Which subgraph is which (G' or Q'?) (One is nodes of Q that are in Q', otheris G2toGPrime)
+		alphaPrime = Graph.getalphaPrime(subgraph2, alpha, subgraph1);
 		
 		try {
 			Commitment commit = Q.commit();
@@ -108,7 +116,9 @@ public class Server
 			Server.writeObject(Q);
 		}
 		else if (challenge == 1) {
-			
+			int[] pi = Graph.addIsomorphism(gamma, alphaPrime);
+			Server.writeObject(pi);
+			Server.writeObject(Graph.generateSubgraphList(QPrime));
 		}
 		else {
 			System.out.println("Invalid Challenge: " + challenge);

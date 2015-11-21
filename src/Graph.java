@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-//TODO: Change doIsomorphism to return a new graph
 //TODO: complete subgraph commitment verification
 
 public class Graph {
@@ -34,6 +33,7 @@ public class Graph {
 
 	Graph(List<Vertex> g) {
 		graph = g;
+		adjacencyMatrix = getAdjacencyMatrix(g);
 	}
 
 	static void printGraph(List<Vertex> graph) {
@@ -239,7 +239,7 @@ public class Graph {
 		return false;
 	}
 	
-	public boolean[][] getAdjacencyMatrix() {
+	public static boolean[][] getAdjacencyMatrix(List<Vertex> graph) {
 		boolean[][] mat = new boolean[graph.size()][graph.size()];
 		for(int i =0;i < graph.size(); i++) {
 			Vertex v = graph.get(i);
@@ -383,18 +383,34 @@ public class Graph {
 	 * Check the subgraph they received is within
 	 * the commitment they received earlier
 	 */
-	public boolean verifyCommitment(Commitment commit, int[] nodes) {
-		Commitment verify = new Commitment(this.adjacencyMatrix);
+	public boolean isSubgraph(Commitment commit, int[] graphRelations) throws NoSuchAlgorithmException {
+		Commitment subCommit = this.commit();
 		
-		//Check if the committed values for each node in the commit
-		// match to those in the new commit
-		for (int i = 0; i < verify.size; i++) {
-			for (int j = 0; j < verify.size; j++) {
-				
+		//subCommit[i][j] is the hash of the Q' node
+		//commit[node][k] is what we are comparing to (hash of Q node)
+		int i = 0, j = 0, k = 0;
+		
+		//i represents the node we are looking at
+		for (i = 0; i < subCommit.size; i++) {
+			while (j < subCommit.size && k < commit.size) {
+				int nodeID = graphRelations[i];
+				byte[] QCheck = commit.commit[nodeID][k];
+				byte[] QPrimeCheck = subCommit.commit[i][j];
+				if (Arrays.equals(QCheck, QPrimeCheck)) {
+					j++;
+				}
+				k++;
+			}
+			if (j != subCommit.size) {
+				return false;
 			}
 		}
 		
-		return true;
+		if (k == commit.size && i == subCommit.size) {
+			return true;
+		}
+		
+		return false;
 	}
 	
 	/*

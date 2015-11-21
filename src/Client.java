@@ -1,6 +1,8 @@
 import java.io.*;
 import java.net.*;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 public class Client {
@@ -64,7 +66,7 @@ public class Client {
 	 * 1- reply with random bit, 1 or 0
 	 * 2- wait for reply, verify reply
 	 */
-	public static void main(String[] arg) {
+	public static void main(String[] arg) throws NoSuchAlgorithmException {
 
 		/*int[] arr = {1, 2, 7};
 		new Client();
@@ -87,19 +89,37 @@ public class Client {
 			int[] alpha = (int[]) Client.readObject();
 			Graph Q = (Graph) Client.readObject();
 			
+			//Verify the graph received is the same as what was committed
 			if (!Q.verifyCommitment(commit)) {
-				System.out.println("COMMITMENT VERIFICATION FAILURE");
+				System.out.println("CHALLENGE 0: COMMITMENT VERIFICATION FAILURE");
 				System.exit(0);
 			}
+			//Verify alpha(G2) == Q
 			if (!G2.verifyG2Isomorphism(alpha, Q)) {
-				System.out.println("ISOMORPHISM VERIFICATION FAILURE");
+				System.out.println("CHALLENGE 0: ISOMORPHISM VERIFICATION FAILURE");
 				System.exit(0);
 			}
 			
-			System.out.println("VERIFICATION SUCCESS");
+			System.out.println("CHALLENGE 0: VERIFICATION SUCCESS");
 		}
 		else if (challenge == 1) {
+			int[] pi = (int[]) Client.readObject();
+			int[] QPrimeinQ = (int[]) Client.readObject();
 			
+			Graph QPrime = Graph.doIsomorphism(pi, G1.graph); 
+
+			//Verify Q' is among the committed values
+			if (QPrime.isSubgraph(commit, QPrimeinQ)) {
+				System.out.println("CHALLENGE 1: COMMITMENT VERIFICATION FAILURE");
+				System.exit(0);
+			}
+			//Verify pi(G1) == Q'
+			if (!G1.verifyG1Isomorphism(pi, QPrime)) {
+				System.out.println("CHALLENGE 1: ISOMORPHISM VERIFICATION FAILURE");
+				System.exit(0);
+			}
+			
+			System.out.println("CHALLENGE 1: VERIFICATION SUCCESS");
 		}
 		else {
 			System.out.println("Invalid challenge: " + challenge);
