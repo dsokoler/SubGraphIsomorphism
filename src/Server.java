@@ -20,6 +20,7 @@ public class Server
 			
 			G1 = Graph.readGraphFromFile("G1.txt");
 			G2 = Graph.readGraphFromFile("G2.txt");
+			Graph.printGraph(G2.graph);
 			GPrime = Graph.readGraphFromFile("GPrime.txt");
 			
 			gamma = Graph.readIsomorphismFromFile("gamma.txt");
@@ -79,19 +80,6 @@ public class Server
 	 * 5- reply with requested information
 	 */
 	public static void main(String [] args)	{
-		/*new Server();
-
-		int[] a = (int[])Server.readObject();
-		System.out.println(Arrays.toString(a));
-		Server.writeObject(new int[]{1,9,1});
-
-		System.out.println(Server.readBit());
-		
-		Server.writeBit(1);
-		Server.writeBit(0);
-		
-		
-		Server.close();*/
 		
 		new Server();
 		
@@ -100,19 +88,31 @@ public class Server
 		int[] alpha = {7, 6, 5, 4, 3, 2, 1, 0};
 		
 		//Generate Q by alpha(G2)
-		Graph temp = new Graph(G2.graph);
+		Graph temp = Graph.readGraphFromFile("G2.txt");
 		Q = Graph.doIsomorphism(alpha, temp.graph);
 		
+		System.out.println("Printing G2");
 		Graph.printGraph(G2.graph);
+		System.out.println("Printing alpha");
 		System.out.println(Arrays.toString(alpha));
+		System.out.println("Printing Q");
 		Graph.printGraph(Q.graph);
 		System.out.println();
 		
-		//Generate QPrime through G'->G2->Q)
-		QPrime = G2.generateQPrime(Q, Server.G2toGPrime, alpha);
+		System.out.println("subgraph1 =" + Arrays.toString(G2toGPrime));
+		int[] subgraph2 = Graph.genSubgraph2(G2toGPrime, alpha);
+		
+		//int[] subgraph2 = {6, 5, 4, 7};
+		System.out.println("subgraph2 = " + Arrays.toString(Graph.genSubgraph2(G2toGPrime, alpha)));
+		
+		//Applying subgraph2 to Q
+		Graph Qp = new Graph(Q.getSubgraph(subgraph2));
+		System.out.println("Printing Q-Prime");
+		Graph.printGraph(Qp.graph);
 		
 		//Generate alpha' through Q' -> alpha -> G'
-		alphaPrime = Graph.getalphaPrime(Graph.generateSubgraphList(QPrime), alpha, Graph.generateSubgraphList(GPrime));
+		// G2toGPrime is same as subgraph2
+		alphaPrime = Graph.getalphaPrime(subgraph2, alpha, G2toGPrime);
 		
 		try {
 			Commitment commit = Q.commit();
@@ -128,13 +128,21 @@ public class Server
 			Server.writeObject(Q);
 		}
 		else if (challenge == 1) {
+			// pi = gamma + alphaPrime
+			System.out.println("gamma = " + Arrays.toString(gamma));
 			int[] pi = Graph.addIsomorphism(gamma, alphaPrime);
+			System.out.println("Pi = " + Arrays.toString(pi));
 			Server.writeObject(pi);
-			Server.writeObject(Graph.generateSubgraphList(QPrime));
+			
+			//generate open-commitment of Q-Prime in Q
+			int[] open = Graph.generateSubgraphList(QPrime);
+			System.out.println("Printing open = " + Arrays.toString(open));
+			//Server.writeObject(Graph.generateSubgraphList(QPrime));
 		}
 		else {
 			System.out.println("Invalid Challenge: " + challenge);
 			System.exit(0);
 		}
+		Server.close();
 	}
 }

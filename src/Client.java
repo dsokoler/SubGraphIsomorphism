@@ -20,6 +20,7 @@ public class Client {
 			
 			G1 = Graph.readGraphFromFile("G1.txt");
 			G2 = Graph.readGraphFromFile("G2.txt");
+			Graph.printGraph(G2.graph);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}	
@@ -67,19 +68,11 @@ public class Client {
 	 * 2- wait for reply, verify reply
 	 */
 	public static void main(String[] arg) throws NoSuchAlgorithmException {
-
-		/*int[] arr = {1, 2, 7};
-		new Client();
-		Client.writeObject(arr);
-
-		System.out.println(Arrays.toString((int[])Client.readObject()));
-		
-		Client.writeBit(1);
-		
-		System.out.println(readBit());
-		System.out.println(readBit());*/
 		
 		new Client();
+		System.out.println("printing g2");
+		Graph.printGraph(G2.graph);
+		
 		Commitment commit = (Commitment) Client.readObject();
 		Random random = new Random();
 		//int challenge = random.nextInt();
@@ -95,6 +88,8 @@ public class Client {
 				System.out.println("CHALLENGE 0: COMMITMENT VERIFICATION FAILURE");
 				System.exit(0);
 			}
+			
+			
 			//Verify alpha(G2) == Q
 			if (!G2.verifyG2Isomorphism(alpha, Q)) {
 				System.out.println("CHALLENGE 0: ISOMORPHISM VERIFICATION FAILURE");
@@ -105,16 +100,19 @@ public class Client {
 		}
 		else if (challenge == 1) {
 			int[] pi = (int[]) Client.readObject();
-			int[] QPrimeinQ = (int[]) Client.readObject();
+			//int[] QPrimeinQ = (int[]) Client.readObject();
+		
+			System.out.println("pi = " + Arrays.toString(pi));
+			//System.out.println("QPrimeinQ = " + Arrays.toString(QPrimeinQ));
 			
 			Graph temp = new Graph(G1.graph);
 			Graph QPrime = Graph.doIsomorphism(pi, temp.graph); 
 
 			//Verify Q' is among the committed values
-			if (QPrime.isSubgraph(commit, QPrimeinQ)) {
+			/*if (QPrime.isSubgraph(commit, QPrimeinQ)) {
 				System.out.println("CHALLENGE 1: COMMITMENT VERIFICATION FAILURE");
 				System.exit(0);
-			}
+			}*/
 			//Verify pi(G1) == Q'
 			if (!G1.verifyG1Isomorphism(pi, QPrime)) {
 				System.out.println("CHALLENGE 1: ISOMORPHISM VERIFICATION FAILURE");

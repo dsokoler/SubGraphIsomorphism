@@ -68,9 +68,6 @@ public class Graph implements Serializable {
 	 */
 
 	public static Graph doIsomorphism(int[] iso, List<Vertex> graph) {
-
-
-
 		List<Vertex> n = new ArrayList<Vertex>();
 
 		// initializing arraylist to required size
@@ -83,18 +80,13 @@ public class Graph implements Serializable {
 		for(int i = 0; i < graph.size(); i++) {
 			Vertex v = graph.get(i);
 			v.sort();
-			//System.out.println("iso[i] = " + iso[i] + "and i = " + i);
-			//v.print();
 			if(v.contains(i)) {
 				v.remove(i);
 			}
-			v.add(iso[i]);
 			n.set(iso[i], v);
 			changes[i] = iso[i];
 		}
 		
-		
-		//printGraph(n);
 		
 		// fix relative positions
 		for (int i = 0; i < n.size(); i++) {
@@ -123,25 +115,17 @@ public class Graph implements Serializable {
 			subgraph1.add(v);
 		}
 
-
-		//System.out.println(Arrays.toString(arr));
 		// remove connections not needed
-		//System.out.println("subgraph.size = " + subgraph1.size());
 		for (int i = 0; i < subgraph1.size(); i++) {
 			Vertex v = subgraph1.get(i);
 			v.sort();
-			//System.out.println("v.size =" + v.size());
 			Vertex k = new Vertex();
 			k.nodeID = v.nodeID;
 			for (int j = 0; j < v.size(); j++) {
-				//System.out.println("v.get(j) =" + v.get(j));
 				if(contains(arr, v.get(j))) {
-					//System.out.println("adding");
 					k.add(v.get(j));
 				}
 			}
-			//System.out.println("k.print = ");
-			//k.print();
 			subgraph2.add(k);
 		}
 
@@ -149,10 +133,10 @@ public class Graph implements Serializable {
 			Vertex v = subgraph2.get(i);
 			Vertex u = new Vertex();
 			u.nodeID = v.nodeID;
+			System.out.println("u.nodeID = " + u.nodeID);
 			for (int j = 0; j < v.size(); j++) {
 				int k = v.get(j);
 				int l = searchForElement(arr, k);
-				System.out.println("j = " + j + " vertex = " + k + " index in arr = " + l);
 				u.add(l);
 			}
 			subgraph3.add(u);
@@ -204,7 +188,7 @@ public class Graph implements Serializable {
 		//G' vertices in G2
 		int[] x = new int[subgraph2.length];
 
-		System.out.println(Arrays.toString(subgraph2));
+		//System.out.println(Arrays.toString(subgraph2));
 		
 		// getting subgraph2 vertices in G2
 		for (int i = 0; i < subgraph2.length; i++) {
@@ -243,7 +227,7 @@ public class Graph implements Serializable {
 		}
 
 		List<Vertex> QPrimeList = Q.getSubgraph(alphaPrime);
-		System.out.println("alphaPrimeTest: " + Arrays.toString(alphaPrime));
+		//System.out.println("alphaPrimeTest: " + Arrays.toString(alphaPrime));
 		Graph QPrime = new Graph(QPrimeList);
 
 		//alphaPrime(G') == Q sub alphaPrime?????????
@@ -258,6 +242,7 @@ public class Graph implements Serializable {
 		for (int i = 0; i < sub1.length; i++) {
 			sub2[i] = alpha[sub1[i]];
 		}
+		
 		return sub2;
 
 	}
@@ -475,15 +460,15 @@ public class Graph implements Serializable {
 	 * this: G2
 	 */
 	public boolean verifyG2Isomorphism(int[] iso, Graph Q) {
-		Graph.printGraph(this.graph);
-		System.out.println(Arrays.toString(iso));	
-		
 		//Temp is G2
-		Graph temp = new Graph(this.graph);
-		doIsomorphism(iso, temp.graph);
+		Graph temp = Graph.readGraphFromFile("G2.txt");
+		System.out.println("printing G2 before applying alpha");
 		Graph.printGraph(temp.graph);
+		Graph q1 = doIsomorphism(iso, temp.graph);
+		System.out.println("printing G2 after applying alpha");
+		Graph.printGraph(q1.graph);
 
-		return Arrays.deepEquals(temp.adjacencyMatrix, Q.adjacencyMatrix);
+		return Arrays.deepEquals(q1.adjacencyMatrix, Q.adjacencyMatrix);
 	}
 
 	/*
@@ -492,17 +477,17 @@ public class Graph implements Serializable {
 	 * this: G1
 	 */
 	public boolean verifyG1Isomorphism(int[] iso, Graph QPrime) {
-		Graph temp = new Graph(this.graph);
-		doIsomorphism(iso, temp.graph);
+		Graph temp = Graph.readGraphFromFile("G1.txt");
+		Graph qp = doIsomorphism(iso, temp.graph);
 
-		return Arrays.deepEquals(temp.adjacencyMatrix, QPrime.adjacencyMatrix);
+		return Arrays.deepEquals(qp.adjacencyMatrix, QPrime.adjacencyMatrix);
 	}
 
-	static int[] addIsomorphism(int[] iso1, int[] iso2) {
+	static int[] addIsomorphism(int[] gamma, int[] alphaP) {
 
-		int[] isof = new int[iso1.length];
-		for(int i =0; i <iso1.length; i++) {
-			isof[i] = iso2[iso1[i]];            
+		int[] isof = new int[gamma.length];
+		for(int i =0; i <gamma.length; i++) {
+			isof[i] = alphaP[gamma[i]];            
 		}
 		return isof;
 	}
