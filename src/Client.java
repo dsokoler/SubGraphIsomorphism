@@ -76,7 +76,7 @@ public class Client {
 		Commitment commit = (Commitment) Client.readObject();
 		Random random = new Random();
 		//int challenge = random.nextInt();
-		int challenge = 0;
+		int challenge = 1;
 		Client.writeBit(challenge);
 		
 		if (challenge == 0) {
@@ -100,19 +100,19 @@ public class Client {
 		}
 		else if (challenge == 1) {
 			int[] pi = (int[]) Client.readObject();
-			//int[] QPrimeinQ = (int[]) Client.readObject();
+			int[] QPrimeinQ = (int[]) Client.readObject();
 		
 			System.out.println("pi = " + Arrays.toString(pi));
-			//System.out.println("QPrimeinQ = " + Arrays.toString(QPrimeinQ));
+			System.out.println("QPrimeinQ = " + Arrays.toString(QPrimeinQ));
 			
 			Graph temp = new Graph(G1.graph);
 			Graph QPrime = Graph.doIsomorphism(pi, temp.graph); 
 
 			//Verify Q' is among the committed values
-			/*if (QPrime.isSubgraph(commit, QPrimeinQ)) {
+			if (QPrime.isSubgraph(commit, QPrimeinQ)) {
 				System.out.println("CHALLENGE 1: COMMITMENT VERIFICATION FAILURE");
 				System.exit(0);
-			}*/
+			}
 			//Verify pi(G1) == Q'
 			if (!G1.verifyG1Isomorphism(pi, QPrime)) {
 				System.out.println("CHALLENGE 1: ISOMORPHISM VERIFICATION FAILURE");

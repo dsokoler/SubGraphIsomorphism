@@ -135,9 +135,9 @@ public class Server
 			Server.writeObject(pi);
 			
 			//generate open-commitment of Q-Prime in Q
-			int[] open = Graph.generateSubgraphList(QPrime);
+			int[] open = Graph.generateSubgraphList(Qp);
 			System.out.println("Printing open = " + Arrays.toString(open));
-			//Server.writeObject(Graph.generateSubgraphList(QPrime));
+			Server.writeObject(Graph.generateSubgraphList(Qp));
 		}
 		else {
 			System.out.println("Invalid Challenge: " + challenge);

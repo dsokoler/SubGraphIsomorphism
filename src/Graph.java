@@ -121,6 +121,7 @@ public class Graph implements Serializable {
 			v.sort();
 			Vertex k = new Vertex();
 			k.nodeID = v.nodeID;
+			System.out.println("k.nodeID = " + k.nodeID);
 			for (int j = 0; j < v.size(); j++) {
 				if(contains(arr, v.get(j))) {
 					k.add(v.get(j));
