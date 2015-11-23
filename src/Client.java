@@ -76,7 +76,7 @@ public class Client {
 		Commitment commit = (Commitment) Client.readObject();
 		Random random = new Random();
 		//int challenge = random.nextInt();
-		int challenge = 1;
+		int challenge = 0;
 		Client.writeBit(challenge);
 		
 		if (challenge == 0) {
