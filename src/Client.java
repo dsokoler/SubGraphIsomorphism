@@ -97,18 +97,18 @@ public class Client {
 				
 				//Verify the graph received is the same as what was committed
 				if (!Q.verifyCommitment(commit)) {
-					System.out.println("CHALLENGE 0: COMMITMENT VERIFICATION FAILURE");
+					System.out.printf("CHALLENGE %d (0): COMMITMENT VERIFICATION FAILURE\n", runs);
 					System.exit(0);
 				}
 				
 				
 				//Verify alpha(G2) == Q
 				if (!G2.verifyG2Isomorphism(alpha, Q)) {
-					System.out.println("CHALLENGE 0: ISOMORPHISM VERIFICATION FAILURE");
+					System.out.printf("CHALLENGE %d (0): ISOMORPHISM VERIFICATION FAILURE\n", runs);
 					System.exit(0);
 				}
 				
-				System.out.println("CHALLENGE 0: VERIFICATION SUCCESS");
+				System.out.printf("CHALLENGE %d (0): VERIFICATION SUCCESS\n", runs);
 			}
 			else if (challenges[runs] == 1) {
 				int[] pi = (int[]) Client.readObject();
@@ -119,16 +119,16 @@ public class Client {
 	
 				//Verify Q' is among the committed values
 				if (!Graph.isSubgraph(commit, QPrimeinQ)) {
-					System.out.println("CHALLENGE 1: COMMITMENT VERIFICATION FAILURE");
+					System.out.printf("CHALLENGE %d (1): COMMITMENT VERIFICATION FAILURE\n", runs);
 					System.exit(0);
 				}
 				//Verify pi(G1) == Q'
 				if (!G1.verifyG1Isomorphism(pi, QPrime)) {
-					System.out.println("CHALLENGE 1: ISOMORPHISM VERIFICATION FAILURE");
+					System.out.printf("CHALLENGE %d (1): ISOMORPHISM VERIFICATION FAILURE\n", runs);
 					System.exit(0);
 				}
 				
-				System.out.println("CHALLENGE 1: VERIFICATION SUCCESS");
+				System.out.printf("CHALLENGE %d (1): VERIFICATION SUCCESS\n", runs);
 			}
 			else {
 				System.out.println("Invalid challenge: " + challenges[runs]);
@@ -136,6 +136,7 @@ public class Client {
 			}
 			//System.out.println();
 		}
+		System.out.println("Server Knowledge Verified.");
 		
 
 		Client.close();
