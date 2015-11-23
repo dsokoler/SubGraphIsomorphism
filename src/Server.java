@@ -19,6 +19,9 @@ public class Server
 			socketConnection = new ServerSocket(34695);
 			
 			G1 = Graph.readGraphFromFile("G1.txt");
+			//System.out.println("Server intial read of G1");
+			//Graph.printGraph(G1.graph);
+			//System.out.println();
 			G2 = Graph.readGraphFromFile("G2.txt");
 			GPrime = Graph.readGraphFromFile("GPrime.txt");
 			
@@ -46,7 +49,7 @@ public class Server
 	public static Object readObject() {
 		try {
 			Object ob = serverInputStream.readObject();
-			System.out.println("readObject: " + (int) ob);
+			//System.out.println("readObject: " + (int) ob);
 			return ob;
 		} catch (Exception e) {
 			System.out.println("returning null");
@@ -60,7 +63,7 @@ public class Server
 	
 	public static int readBit() {
 		int i = (int)readObject();
-		System.out.println("readBit: " + i);
+		//System.out.println("readBit: " + i);
 		return i;
 	}
 	
@@ -83,15 +86,16 @@ public class Server
 	public static void main(String [] args) throws IOException	{
 		
 		new Server();
+		int numberOfRuns = Integer.parseInt(args[0]);
 		
-		for (int runs = 0; runs < 10; runs++) {
-			System.out.println("Run " + runs);
+		for (int runs = 0; runs < numberOfRuns; runs++) {
+			//System.out.println("Run " + runs);
 			//Generate alpha (G2 -> Q)
 			int[] alpha = G2.generateIsomorphism();
 			//int[] alpha = {7, 6, 5, 4, 3, 2, 1, 0};
 			
 			//Generate Q by alpha(G2)
-			Graph temp = Graph.readGraphFromFile("G2.txt");
+			Graph temp = new Graph(G2.adjacencyMatrix);
 			Q = Graph.doIsomorphism(alpha, temp.graph);
 			
 			int[] subgraph2 = Graph.genSubgraph2(G2toGPrime, alpha);
@@ -122,7 +126,7 @@ public class Server
 				int[] pi = Graph.addIsomorphism(gamma, alphaPrime);
 				Server.writeObject(pi);
 				
-				Graph temp1 = new Graph(G1.graph);
+				Graph temp1 = new Graph(G1.adjacencyMatrix);
 				Graph QPrime = Graph.doIsomorphism(pi, temp1.graph); 
 				
 				//generate open-commitment of Q-Prime in Q
@@ -149,7 +153,7 @@ public class Server
 				System.out.println("Invalid Challenge: " + challenge);
 				System.exit(0);
 			}
-			System.out.println();
+			//System.out.println();
 		}
 		Server.close();
 	}

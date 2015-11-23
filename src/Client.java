@@ -19,6 +19,9 @@ public class Client {
 			clientInputStream = new ObjectInputStream(socketConnection.getInputStream());
 			
 			G1 = Graph.readGraphFromFile("G1.txt");
+			//System.out.println("Client intial read of G1");
+			//Graph.printGraph(G1.graph);
+			//System.out.println();
 			G2 = Graph.readGraphFromFile("G2.txt");
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -27,7 +30,7 @@ public class Client {
 
 	public static void writeObject(Object ob) {
 		try {
-			System.out.println("Sending: " + (int) ob);
+			//System.out.println("Sending: " + (int) ob);
 			clientOutputStream.writeObject(ob);
 			clientOutputStream.flush();
 		} catch (IOException e) {
@@ -67,20 +70,21 @@ public class Client {
 	 * 1- reply with random bit, 1 or 0
 	 * 2- wait for reply, verify reply
 	 */
-	public static void main(String[] arg) throws NoSuchAlgorithmException, IOException {
+	public static void main(String[] args) throws NoSuchAlgorithmException, IOException {
 		
 		new Client();
-		int[] challenges = new int[10];
+		int numberOfRuns = Integer.parseInt(args[0]);
+		int[] challenges = new int[numberOfRuns];
 		Random random = new Random();
 		System.out.println("Challenges: ");
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < numberOfRuns; i++) {
 			challenges[i] = random.nextInt(2);
 			System.out.printf("%d ", challenges[i]);
 		}
 		System.out.println();
 		System.out.println();
-		for (int runs = 0; runs < 10; runs++) {
-			System.out.println("Run " + runs);
+		for (int runs = 0; runs < numberOfRuns; runs++) {
+			//System.out.println("Run " + runs);
 			Commitment commit = (Commitment) Client.readObject();
 			
 			//int challenge = random.nextInt(2);
@@ -110,7 +114,7 @@ public class Client {
 				int[] pi = (int[]) Client.readObject();
 				int[][] QPrimeinQ = (int[][]) Client.readObject();
 				
-				Graph temp = new Graph(G1.graph);
+				Graph temp = new Graph(G1.adjacencyMatrix);
 				Graph QPrime = Graph.doIsomorphism(pi, temp.graph); 
 	
 				//Verify Q' is among the committed values
@@ -130,7 +134,7 @@ public class Client {
 				System.out.println("Invalid challenge: " + challenges[runs]);
 				System.exit(0);
 			}
-			System.out.println();
+			//System.out.println();
 		}
 		
 

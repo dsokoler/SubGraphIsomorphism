@@ -480,6 +480,13 @@ public class Graph implements Serializable {
 	public boolean verifyG1Isomorphism(int[] iso, Graph QPrime) {
 		Graph temp = new Graph(this.adjacencyMatrix);
 		Graph qp = doIsomorphism(iso, temp.graph);
+		
+		//System.out.println("Pi: " + Arrays.toString(iso));
+		//System.out.println("VerifyG1Isomorphism:");
+		//System.out.println("G1");
+		//Graph.printGraph(temp.graph);
+		//System.out.println("QPrime");
+		//Graph.printGraph(graph);
 
 		return Arrays.deepEquals(qp.adjacencyMatrix, QPrime.adjacencyMatrix);
 	}
