@@ -20,7 +20,6 @@ public class Client {
 			
 			G1 = Graph.readGraphFromFile("G1.txt");
 			G2 = Graph.readGraphFromFile("G2.txt");
-			Graph.printGraph(G2.graph);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}	
@@ -28,6 +27,7 @@ public class Client {
 
 	public static void writeObject(Object ob) {
 		try {
+			System.out.println("Sending: " + (int) ob);
 			clientOutputStream.writeObject(ob);
 			clientOutputStream.flush();
 		} catch (IOException e) {
@@ -67,65 +67,71 @@ public class Client {
 	 * 1- reply with random bit, 1 or 0
 	 * 2- wait for reply, verify reply
 	 */
-	public static void main(String[] arg) throws NoSuchAlgorithmException {
+	public static void main(String[] arg) throws NoSuchAlgorithmException, IOException {
 		
 		new Client();
-		System.out.println("printing g2");
-		Graph.printGraph(G2.graph);
-		
-		Commitment commit = (Commitment) Client.readObject();
+		int[] challenges = new int[10];
 		Random random = new Random();
-		//int challenge = random.nextInt();
-		int challenge = 0;
-		Client.writeBit(challenge);
-		
-		if (challenge == 0) {
-			int[] alpha = (int[]) Client.readObject();
-			Graph Q = (Graph) Client.readObject();
-			
-			//Verify the graph received is the same as what was committed
-			if (!Q.verifyCommitment(commit)) {
-				System.out.println("CHALLENGE 0: COMMITMENT VERIFICATION FAILURE");
-				System.exit(0);
-			}
-			
-			
-			//Verify alpha(G2) == Q
-			if (!G2.verifyG2Isomorphism(alpha, Q)) {
-				System.out.println("CHALLENGE 0: ISOMORPHISM VERIFICATION FAILURE");
-				System.exit(0);
-			}
-			
-			System.out.println("CHALLENGE 0: VERIFICATION SUCCESS");
+		System.out.println("Challenges: ");
+		for (int i = 0; i < 10; i++) {
+			challenges[i] = random.nextInt(2);
+			System.out.printf("%d ", challenges[i]);
 		}
-		else if (challenge == 1) {
-			int[] pi = (int[]) Client.readObject();
-			int[] QPrimeinQ = (int[]) Client.readObject();
-		
-			System.out.println("pi = " + Arrays.toString(pi));
-			System.out.println("QPrimeinQ = " + Arrays.toString(QPrimeinQ));
+		System.out.println();
+		System.out.println();
+		for (int runs = 0; runs < 10; runs++) {
+			System.out.println("Run " + runs);
+			Commitment commit = (Commitment) Client.readObject();
 			
-			Graph temp = new Graph(G1.graph);
-			Graph QPrime = Graph.doIsomorphism(pi, temp.graph); 
-
-			//Verify Q' is among the committed values
-			if (QPrime.isSubgraph(commit, QPrimeinQ)) {
-				System.out.println("CHALLENGE 1: COMMITMENT VERIFICATION FAILURE");
+			//int challenge = random.nextInt(2);
+			//Client.writeBit(challenge);
+			Client.writeBit(challenges[runs]);
+			
+			if (challenges[runs] == 0) {
+				int[] alpha = (int[]) Client.readObject();
+				Graph Q = (Graph) Client.readObject();
+				
+				//Verify the graph received is the same as what was committed
+				if (!Q.verifyCommitment(commit)) {
+					System.out.println("CHALLENGE 0: COMMITMENT VERIFICATION FAILURE");
+					System.exit(0);
+				}
+				
+				
+				//Verify alpha(G2) == Q
+				if (!G2.verifyG2Isomorphism(alpha, Q)) {
+					System.out.println("CHALLENGE 0: ISOMORPHISM VERIFICATION FAILURE");
+					System.exit(0);
+				}
+				
+				System.out.println("CHALLENGE 0: VERIFICATION SUCCESS");
+			}
+			else if (challenges[runs] == 1) {
+				int[] pi = (int[]) Client.readObject();
+				int[][] QPrimeinQ = (int[][]) Client.readObject();
+				
+				Graph temp = new Graph(G1.graph);
+				Graph QPrime = Graph.doIsomorphism(pi, temp.graph); 
+	
+				//Verify Q' is among the committed values
+				if (!Graph.isSubgraph(commit, QPrimeinQ)) {
+					System.out.println("CHALLENGE 1: COMMITMENT VERIFICATION FAILURE");
+					System.exit(0);
+				}
+				//Verify pi(G1) == Q'
+				if (!G1.verifyG1Isomorphism(pi, QPrime)) {
+					System.out.println("CHALLENGE 1: ISOMORPHISM VERIFICATION FAILURE");
+					System.exit(0);
+				}
+				
+				System.out.println("CHALLENGE 1: VERIFICATION SUCCESS");
+			}
+			else {
+				System.out.println("Invalid challenge: " + challenges[runs]);
 				System.exit(0);
 			}
-			//Verify pi(G1) == Q'
-			if (!G1.verifyG1Isomorphism(pi, QPrime)) {
-				System.out.println("CHALLENGE 1: ISOMORPHISM VERIFICATION FAILURE");
-				System.exit(0);
-			}
-			
-			System.out.println("CHALLENGE 1: VERIFICATION SUCCESS");
+			System.out.println();
 		}
-		else {
-			System.out.println("Invalid challenge: " + challenge);
-			System.exit(0);
-		}
-		
 		
 
 		Client.close();

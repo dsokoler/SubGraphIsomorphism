@@ -3,6 +3,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,7 +39,7 @@ public class Graph implements Serializable {
 		graph = g;
 		adjacencyMatrix = getAdjacencyMatrix(g);
 	}
-
+	
 	static void printGraph(List<Vertex> graph) {
 		System.out.printf(" ");
 		for(int i = 0; i < graph.size(); i++) {
@@ -121,7 +122,6 @@ public class Graph implements Serializable {
 			v.sort();
 			Vertex k = new Vertex();
 			k.nodeID = v.nodeID;
-			System.out.println("k.nodeID = " + k.nodeID);
 			for (int j = 0; j < v.size(); j++) {
 				if(contains(arr, v.get(j))) {
 					k.add(v.get(j));
@@ -134,7 +134,6 @@ public class Graph implements Serializable {
 			Vertex v = subgraph2.get(i);
 			Vertex u = new Vertex();
 			u.nodeID = v.nodeID;
-			System.out.println("u.nodeID = " + u.nodeID);
 			for (int j = 0; j < v.size(); j++) {
 				int k = v.get(j);
 				int l = searchForElement(arr, k);
@@ -188,8 +187,6 @@ public class Graph implements Serializable {
 
 		//G' vertices in G2
 		int[] x = new int[subgraph2.length];
-
-		//System.out.println(Arrays.toString(subgraph2));
 		
 		// getting subgraph2 vertices in G2
 		for (int i = 0; i < subgraph2.length; i++) {
@@ -200,8 +197,6 @@ public class Graph implements Serializable {
 			}
 			x[i] = k;
 		}
-		System.out.println("x =" + Arrays.toString(x));
-		System.out.println("subgraph1 = " + Arrays.toString(subgraph1));
 
 		// comparing those vertices to subgraph 1 (G')
 		int[] alphaP = new int[subgraph1.length];
@@ -209,8 +204,6 @@ public class Graph implements Serializable {
 			int k = searchForElement(x, subgraph1[i]);
 			alphaP[i] = k;
 		}
-
-		System.out.println("alphaP =" + Arrays.toString(alphaP));
 
 		return alphaP;
 
@@ -396,7 +389,6 @@ public class Graph implements Serializable {
 
 		for (int i = 0; i < subgraph.graph.size(); i++) {
 			nodes[i] = subgraph.graph.get(i).nodeID;
-			System.out.printf("Node %d id: %d\n", i, nodes[i]);
 		}
 
 		return nodes;
@@ -425,34 +417,46 @@ public class Graph implements Serializable {
 	 * Check the subgraph they received is within
 	 * the commitment they received earlier
 	 */
-	public boolean isSubgraph(Commitment commit, int[] graphRelations) throws NoSuchAlgorithmException {
-		Commitment subCommit = this.commit();
-
-		//subCommit[i][j] is the hash of the Q' node
-		//commit[node][k] is what we are comparing to (hash of Q node)
-		int i = 0, j = 0, k = 0;
-
-		//i represents the node we are looking at
-		for (i = 0; i < subCommit.size; i++) {
-			while (j < subCommit.size && k < commit.size) {
-				int nodeID = graphRelations[i];
-				byte[] QCheck = commit.commit[nodeID][k];
-				byte[] QPrimeCheck = subCommit.commit[i][j];
-				if (Arrays.equals(QCheck, QPrimeCheck)) {
-					j++;
+	public static boolean isSubgraph(Commitment commit, int[][] QPrime) throws NoSuchAlgorithmException {
+		MessageDigest digest = MessageDigest.getInstance("SHA-256");
+		digest.reset();
+		
+		for (int i = 0; i < commit.size; i++) {
+			for (int j = 0; j < commit.size; j++) {
+				if (QPrime[i][j] != -1) {
+					byte[] bool  = new byte[1];
+					bool[0] = (byte) QPrime[i][j];
+					byte[] check = digest.digest(bool);
+					byte[] commitCheck = commit.commit[i][j];
+					if (!Arrays.equals(check, commitCheck)) {
+						return false;
+					}
+					digest.reset();
 				}
-				k++;
-			}
-			if (j != subCommit.size) {
-				return false;
 			}
 		}
-
-		if (k == commit.size && i == subCommit.size) {
-			return true;
+		
+		return true;
+	}
+	
+	/*
+	 * this: Q
+	 */
+	public int[][] generateSend(int[] nodes) {
+		int size = this.graph.size();
+		int[][] send = new int[size][size];
+		
+		for (int i = 0; i < size; i++) {
+			for (int j = 0; j < size; j++) {
+				if (contains(nodes, i) && contains(nodes, j)) {
+					send[i][j] = this.adjacencyMatrix[i][j] ? 1 : 0;
+				}
+				else {
+					send[i][j] = -1;
+				}
+			}
 		}
-
-		return false;
+		return send;
 	}
 
 	/*
@@ -463,11 +467,7 @@ public class Graph implements Serializable {
 	public boolean verifyG2Isomorphism(int[] iso, Graph Q) {
 		//Temp is G2
 		Graph temp = Graph.readGraphFromFile("G2.txt");
-		System.out.println("printing G2 before applying alpha");
-		Graph.printGraph(temp.graph);
 		Graph q1 = doIsomorphism(iso, temp.graph);
-		System.out.println("printing G2 after applying alpha");
-		Graph.printGraph(q1.graph);
 
 		return Arrays.deepEquals(q1.adjacencyMatrix, Q.adjacencyMatrix);
 	}
@@ -478,7 +478,7 @@ public class Graph implements Serializable {
 	 * this: G1
 	 */
 	public boolean verifyG1Isomorphism(int[] iso, Graph QPrime) {
-		Graph temp = Graph.readGraphFromFile("G1.txt");
+		Graph temp = new Graph(this.adjacencyMatrix);
 		Graph qp = doIsomorphism(iso, temp.graph);
 
 		return Arrays.deepEquals(qp.adjacencyMatrix, QPrime.adjacencyMatrix);
@@ -531,7 +531,6 @@ public class Graph implements Serializable {
 		Graph g2 = new Graph(adjMat);
 
 		int[] alpha = {7, 2, 0, 6, 1, 4, 3, 5};
-		printGraph(g2.graph);
 
 		Graph g3 = new Graph(adjMat);
 
