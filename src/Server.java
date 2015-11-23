@@ -128,7 +128,7 @@ public class Server
 				
 				int[][] toSend = Q.generateSend(QPrimeinQ);
 				
-				//Server.writeObject(toSend);
+				Server.writeObject(toSend);
 				
 				int[][] test = {
 						{1, 1, 1, 1, 1, 1, 1, 1},
@@ -141,7 +141,7 @@ public class Server
 						{1, 1, 1, 1, 1, 1, 1, 1},
 				};
 				
-				Server.writeObject(test);
+				//Server.writeObject(test);
 			}
 			else {
 				System.out.println("Invalid Challenge: " + challenge);
