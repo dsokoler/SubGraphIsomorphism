@@ -40,6 +40,49 @@ public class Graph implements Serializable {
 		adjacencyMatrix = getAdjacencyMatrix(g);
 	}
 	
+	/*
+	 * this: GPrime
+	 */
+	public Graph generateG2(int size) {
+		boolean[][] matrix = new boolean[size][size];
+		Random random = new Random();
+		
+		for (int i = 0; i < this.adjacencyMatrix.length; i++) {
+			int j;
+			for (j = 0; j < this.adjacencyMatrix.length; j++) {
+				matrix[i][j] = this.adjacencyMatrix[i][j];
+			}
+			for (; j < size; j++) {
+				matrix[i][j] = (random.nextInt(2) == 0) ? false : true;
+				matrix[j][i] = matrix[i][j];
+				if (i == j) break;
+			}
+		}
+		for (int i = this.adjacencyMatrix.length; i < size; i++) {
+			for (int j = this.adjacencyMatrix.length; j < size; j++) {
+				matrix[i][j] = (random.nextInt(2) == 0) ? false : true;
+				matrix[j][i] = matrix[i][j];
+				if (i == j) break;
+			}
+		}
+		
+		return new Graph(matrix);
+	}
+	
+	public static Graph generateG1(int size) {
+		boolean[][] matrix = new boolean[size][size];
+		Random random = new Random();
+		for (int i = 0; i < size; i++) {
+			for (int j = 0; j < size; j++) {
+				matrix[i][j] = (random.nextInt(2) == 0) ? false : true;
+				matrix[j][i] = matrix[i][j];
+				if (i == j) break;
+			}
+		}
+		
+		return new Graph(matrix);
+	}
+	
 	static void printGraph(List<Vertex> graph) {
 		System.out.printf(" ");
 		for(int i = 0; i < graph.size(); i++) {
@@ -60,6 +103,7 @@ public class Graph implements Serializable {
 			}
 			System.out.println();
 		}
+		System.out.println();
 	}
 
 	/*
@@ -494,35 +538,52 @@ public class Graph implements Serializable {
 	static int[] addIsomorphism(int[] gamma, int[] alphaP) {
 
 		int[] isof = new int[gamma.length];
-		for(int i =0; i <gamma.length; i++) {
+		for(int i =0; i < gamma.length; i++) {
 			isof[i] = alphaP[gamma[i]];            
 		}
 		return isof;
 	}
+	
+	public boolean isSubgraph(Graph parent, int[] nodeRelations) {
+		for (int i = 0; i < this.adjacencyMatrix.length; i++) {
+			for (int j = 0; j < this.adjacencyMatrix.length; j++) {
+				int parentI = nodeRelations[i];
+				int parentJ = nodeRelations[j];
+				if (this.adjacencyMatrix[i][j] != parent.adjacencyMatrix[parentI][parentJ]) {
+					System.out.println("NOT EQUAL");
+					return false;
+				}
+			}
+		}
+		System.out.println("EQUAL");
+		return true;
+	}
 
 
 	public static void main(String[] args) {
-		/*Graph test = readGraphFromFile("testGraphReading.txt");
-
-		boolean adjMat[][] = 
-			{
-				{true,  true,  false, false, true,  false, false, false},
-				{true,  true,  false, true,  true,  false, false, true},
-				{false, false, true,  true,  true,  false, true,  true},
-				{false, true,  true,  true,  false, true,  true,  false},
-				{true,  true,  true,  false, true,  true,  false, false},
-				{false, false, false, true,  true,  true,  true,  false},
-				{false, false, true,  true,  false, false, true,  true},
-				{false, true,  true,  false, false, false, true,  true}
-			};
-
-		if(Arrays.deepEquals(test.adjacencyMatrix, adjMat)) {
-			System.out.println("READ FROM FILE SUCCESS");
-		}
-
-		Graph g = new Graph(adjMat);
-		printGraph(g.graph);
-		 */
+		
+		Graph G1 = generateG1(15);
+		Graph.printGraph(G1.graph);
+		int[] gamma = G1.generateIsomorphism();
+		
+		Graph temp = new Graph(G1.adjacencyMatrix);
+		Graph GPrime = doIsomorphism(gamma, temp.graph);
+		Graph.printGraph(GPrime.graph);
+		
+		Graph G2 = GPrime.generateG2(25);
+		Graph.printGraph(G2.graph);
+		
+		int[] G2toGPrime = new int[15];
+		for (int i = 0; i < 15; i++) G2toGPrime[i] = i;
+		
+		// Ensuring that getting the subgraph with the nodes does indeed work
+		Graph GPrimeTest = new Graph(G2.getSubgraph(G2toGPrime));
+		Graph.printGraph(GPrime.graph);
+		Graph.printGraph(GPrimeTest.graph);
+		
+		GPrimeTest.isSubgraph(G2, G2toGPrime);
+		GPrime.isSubgraph(G2, G2toGPrime);
+		
 		boolean adjMat[][] = 
 			{
 				{true,  true,  false, false, true,  false, false, false},
@@ -536,51 +597,6 @@ public class Graph implements Serializable {
 			};
 
 		Graph g2 = new Graph(adjMat);
-
-		int[] alpha = {7, 2, 0, 6, 1, 4, 3, 5};
-
-		Graph g3 = new Graph(adjMat);
-
-
-		Graph Q = doIsomorphism(alpha, g3.graph);
-		System.out.println("g2");
-		printGraph(g2.graph);
-		System.out.println("g3");
-		printGraph(g3.graph);
-
-		/*
-		System.out.println("graph Q = ");
-		printGraph(Q.graph);
-
-		int[] subGraph2 = {0, 1, 4, 6};
-
-		List<Vertex> QPrime = Q.getSubgraph(subGraph2);
-
-		System.out.println("graph QPrime = ");
-		printSubgraph(QPrime, subGraph2);
-
-
-		printGraph(g2.graph);
-		int[] subGraph1 = {2, 3, 4, 5};
-		List<Vertex> GPrime = g2.getSubgraph(subGraph1);
-
-		System.out.println("graph GPrime = ");
-		printSubgraph(GPrime, subGraph1);
-
-
-		int[] alphaP = getalphaPrime(subGraph2,alpha, subGraph1);
-		System.out.println("alphaP = " + Arrays.toString(alphaP));
-
-		Graph QPrime_1 = doIsomorphism(alphaP, GPrime);
-		printGraph(QPrime_1.graph);
-
-	}
-
-		int[] sub1 = {2, 3, 4, 5};
-		int[] alpha = {7, 2, 0, 6, 1, 4, 3, 5};
-		int[] sub2 = genSubgraph2(sub1, alpha);
-		System.out.println(Arrays.toString(sub2));
-		 */
 	}
 }
 

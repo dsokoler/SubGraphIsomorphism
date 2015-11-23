@@ -73,8 +73,10 @@ public class Client {
 	public static void main(String[] args) throws NoSuchAlgorithmException, IOException {
 		
 		new Client();
+		
 		int numberOfRuns = Integer.parseInt(args[0]);
 		int[] challenges = new int[numberOfRuns];
+		
 		Random random = new Random();
 		System.out.println("Challenges: ");
 		for (int i = 0; i < numberOfRuns; i++) {
@@ -83,12 +85,10 @@ public class Client {
 		}
 		System.out.println();
 		System.out.println();
+		
 		for (int runs = 0; runs < numberOfRuns; runs++) {
-			//System.out.println("Run " + runs);
 			Commitment commit = (Commitment) Client.readObject();
 			
-			//int challenge = random.nextInt(2);
-			//Client.writeBit(challenge);
 			Client.writeBit(challenges[runs]);
 			
 			if (challenges[runs] == 0) {
@@ -98,6 +98,7 @@ public class Client {
 				//Verify the graph received is the same as what was committed
 				if (!Q.verifyCommitment(commit)) {
 					System.out.printf("CHALLENGE %d (0): COMMITMENT VERIFICATION FAILURE\n", runs);
+					System.out.println("Server Knowledge is False.");
 					System.exit(0);
 				}
 				
@@ -105,6 +106,7 @@ public class Client {
 				//Verify alpha(G2) == Q
 				if (!G2.verifyG2Isomorphism(alpha, Q)) {
 					System.out.printf("CHALLENGE %d (0): ISOMORPHISM VERIFICATION FAILURE\n", runs);
+					System.out.println("Server Knowledge is False.");
 					System.exit(0);
 				}
 				
@@ -120,11 +122,13 @@ public class Client {
 				//Verify Q' is among the committed values
 				if (!Graph.isSubgraph(commit, QPrimeinQ)) {
 					System.out.printf("CHALLENGE %d (1): COMMITMENT VERIFICATION FAILURE\n", runs);
+					System.out.println("Server Knowledge is False.");
 					System.exit(0);
 				}
 				//Verify pi(G1) == Q'
 				if (!G1.verifyG1Isomorphism(pi, QPrime)) {
 					System.out.printf("CHALLENGE %d (1): ISOMORPHISM VERIFICATION FAILURE\n", runs);
+					System.out.println("Server Knowledge is False.");
 					System.exit(0);
 				}
 				
@@ -134,7 +138,6 @@ public class Client {
 				System.out.println("Invalid challenge: " + challenges[runs]);
 				System.exit(0);
 			}
-			//System.out.println();
 		}
 		System.out.println("Server Knowledge Verified.");
 		

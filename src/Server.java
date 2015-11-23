@@ -49,7 +49,6 @@ public class Server
 	public static Object readObject() {
 		try {
 			Object ob = serverInputStream.readObject();
-			//System.out.println("readObject: " + (int) ob);
 			return ob;
 		} catch (Exception e) {
 			System.out.println("returning null");
@@ -63,7 +62,6 @@ public class Server
 	
 	public static int readBit() {
 		int i = (int)readObject();
-		//System.out.println("readBit: " + i);
 		return i;
 	}
 	
@@ -89,18 +87,14 @@ public class Server
 		int numberOfRuns = Integer.parseInt(args[0]);
 		
 		for (int runs = 0; runs < numberOfRuns; runs++) {
-			//System.out.println("Run " + runs);
 			//Generate alpha (G2 -> Q)
 			int[] alpha = G2.generateIsomorphism();
-			//int[] alpha = {7, 6, 5, 4, 3, 2, 1, 0};
 			
 			//Generate Q by alpha(G2)
 			Graph temp = new Graph(G2.adjacencyMatrix);
 			Q = Graph.doIsomorphism(alpha, temp.graph);
 			
 			int[] subgraph2 = Graph.genSubgraph2(G2toGPrime, alpha);
-			
-			//int[] subgraph2 = {6, 5, 4, 7};
 			
 			//Applying subgraph2 to Q
 			Graph Qp = new Graph(Q.getSubgraph(subgraph2));
@@ -134,7 +128,7 @@ public class Server
 				
 				int[][] toSend = Q.generateSend(QPrimeinQ);
 				
-				Server.writeObject(toSend);
+				//Server.writeObject(toSend);
 				
 				int[][] test = {
 						{1, 1, 1, 1, 1, 1, 1, 1},
@@ -147,13 +141,12 @@ public class Server
 						{1, 1, 1, 1, 1, 1, 1, 1},
 				};
 				
-				//Server.writeObject(test);
+				Server.writeObject(test);
 			}
 			else {
 				System.out.println("Invalid Challenge: " + challenge);
 				System.exit(0);
 			}
-			//System.out.println();
 		}
 		Server.close();
 	}
